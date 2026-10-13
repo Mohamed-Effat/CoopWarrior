@@ -27,7 +27,7 @@
                             <TextBlock Text="Co-op Warrior" Style="{StaticResource TitleTextBlockStyle}" />
                             <TextBlock x:Name="VersionText" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                             <TextBlock Margin="0,12,0,0" TextWrapping="Wrap"
-                                       Text="Turns your keyboard and mouse into a second Xbox controller, so split-screen games can have another player." />
+                                       Text="Turns your keyboard and mouse into an Xbox controller, so one more player can join split-screen games." />
                             <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,12,0,0">
                                 <FontIcon Glyph="&#xE77B;" FontSize="16" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
                                 <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}">
@@ -39,9 +39,27 @@
                     </Grid>
                 </Border>
 
+                <TextBlock Text="Updates" Style="{StaticResource GroupHeaderStyle}" />
+                <tk:SettingsCard x:Name="UpdateCard" Header="Updates">
+                    <tk:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE895;" />
+                    </tk:SettingsCard.HeaderIcon>
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <ProgressRing x:Name="UpdateRing" Width="20" Height="20" IsActive="False" />
+                        <Button x:Name="UpdateButton" Content="Check for updates" Click="UpdateButton_Click" />
+                    </StackPanel>
+                </tk:SettingsCard>
+                <tk:SettingsCard x:Name="AutoCard" Header="Check for updates automatically"
+                                 Description="When Co-op Warrior starts, it looks for a new version on GitHub. It looks at most once a day.">
+                    <tk:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE823;" />
+                    </tk:SettingsCard.HeaderIcon>
+                    <ToggleSwitch x:Name="AutoToggle" Toggled="AutoToggle_Toggled" />
+                </tk:SettingsCard>
+
                 <TextBlock Text="Built with" Style="{StaticResource GroupHeaderStyle}" />
                 <tk:SettingsCard Header="ViGEmBus"
-                                 Description="The virtual gamepad driver, by Nefarius Software Solutions. BSD 3-Clause license.">
+                                 Description="The driver that adds the controller to Windows, by Nefarius Software Solutions. BSD 3-Clause license.">
                     <tk:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE7FC;" />
                     </tk:SettingsCard.HeaderIcon>
@@ -61,6 +79,23 @@
                     <tk:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE8F1;" />
                     </tk:SettingsCard.HeaderIcon>
+                </tk:SettingsCard>
+                <tk:SettingsCard Header="Velopack" Description="The installer and automatic updates. MIT license.">
+                    <tk:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE896;" />
+                    </tk:SettingsCard.HeaderIcon>
+                </tk:SettingsCard>
+
+                <TextBlock Text="License" Style="{StaticResource GroupHeaderStyle}" />
+                <tk:SettingsCard Header="GNU General Public License v3"
+                                 Description="Co-op Warrior is free software. The license adds a permission to use Microsoft's Windows libraries. Click to read the license and the notices for the software above."
+                                 IsClickEnabled="True" Click="License_Click">
+                    <tk:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE8A5;" />
+                    </tk:SettingsCard.HeaderIcon>
+                    <tk:SettingsCard.ActionIcon>
+                        <FontIcon Glyph="&#xE8A7;" />
+                    </tk:SettingsCard.ActionIcon>
                 </tk:SettingsCard>
             </StackPanel>
         </ScrollViewer>

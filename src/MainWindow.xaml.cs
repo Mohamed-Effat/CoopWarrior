@@ -49,16 +49,16 @@ public sealed partial class MainWindow : Window
         {
             timer.Stop();
             App.Engine.Stop();
-            App.Config.Save();
+            App.Profile.Save();
             App.Store.SaveSettings();
         };
 
-        ShowConfigName();
+        ShowProfileName();
         App.Store.ActiveChanged += () =>
         {
-            ShowConfigName();
-            // Pages read the active config when they are created.
-            if (ContentFrame.CurrentSourcePageType is Type page && page != typeof(ConfigsPage) && page != typeof(TutorialPage))
+            ShowProfileName();
+            // Pages read the active profile when they are created.
+            if (ContentFrame.CurrentSourcePageType is Type page && page != typeof(ProfilesPage) && page != typeof(TutorialPage))
                 ContentFrame.Navigate(page, null, new SuppressNavigationTransitionInfo());
         };
 
@@ -66,14 +66,68 @@ public sealed partial class MainWindow : Window
         ((UIElement)Content).PreviewKeyDown += (_, e) =>
         {
             Core.Engine engine = App.Engine;
-            if (engine.Running && !engine.Paused && App.Config.Keys.Values.Any(k => k.Contains((int)e.Key)))
+            if (engine.Running && !engine.Paused && App.Profile.Keys.Values.Any(k => k.Contains((int)e.Key)))
                 e.Handled = true;
         };
 
         Nav.SelectedItem = App.Store.TutorialSeen ? Nav.MenuItems[0] : Nav.FooterMenuItems[0];
+
+        Core.Updater.Changed += ShowUpdateBar;
+        _ = CheckForUpdatesOnStartAsync();
     }
 
-    public void ShowConfigName() => ConfigText.Text = App.Config.Name;
+    public void ShowProfileName() => ProfileText.Text = App.Profile.Name;
+
+    /// <summary>Checks GitHub at most once every 20 hours, and only when the user has not turned checks off.</summary>
+    static async Task CheckForUpdatesOnStartAsync()
+    {
+        Core.ProfileStore store = App.Store;
+        if (!Core.Updater.IsInstalled || !store.CheckForUpdates) return;
+        if (DateTime.UtcNow - store.LastUpdateCheck.ToUniversalTime() < TimeSpan.FromHours(20)) return;
+        await Core.Updater.CheckAsync();
+        if (Core.Updater.Status != Core.UpdateStatus.Failed)
+        {
+            store.LastUpdateCheck = DateTime.UtcNow;
+            store.SaveSettings();
+        }
+    }
+
+    void ShowUpdateBar()
+    {
+        switch (Core.Updater.Status)
+        {
+            case Core.UpdateStatus.Available:
+                UpdateBar.Severity = InfoBarSeverity.Informational;
+                UpdateBar.Title = "Update available";
+                UpdateBar.Message = $"Co-op Warrior {Core.Updater.AvailableVersion} is ready to download. " +
+                                    "Your profiles and settings are kept.";
+                UpdateBarButton.IsEnabled = true;
+                UpdateBar.IsOpen = true;
+                break;
+            case Core.UpdateStatus.Downloading:
+                UpdateBar.Title = "Downloading the update";
+                UpdateBar.Message = $"{Core.Updater.DownloadPercent}%. Co-op Warrior restarts when it is done.";
+                UpdateBarButton.IsEnabled = false;
+                UpdateBar.IsOpen = true;
+                break;
+            case Core.UpdateStatus.Failed when UpdateBar.IsOpen:
+                UpdateBar.Severity = InfoBarSeverity.Error;
+                UpdateBar.Title = "The update did not finish";
+                UpdateBar.Message = Core.Updater.Error;
+                UpdateBarButton.IsEnabled = true;
+                break;
+        }
+    }
+
+    void UpdateBarButton_Click(object sender, RoutedEventArgs e) => _ = UpdateNowAsync();
+
+    /// <summary>Downloads and applies the available update; the virtual pad is removed before the restart.</summary>
+    public static Task UpdateNowAsync() => Core.Updater.UpdateAndRestartAsync(() =>
+    {
+        App.Engine.Stop();
+        App.Profile.Save();
+        App.Store.SaveSettings();
+    });
 
     /// <summary>Colors the minimize, maximize and close buttons to match the app theme.</summary>
     /// <remarks>With the content extended into the title bar, Windows 10 draws them in the system theme's colors,
@@ -130,7 +184,7 @@ public sealed partial class MainWindow : Window
         {
             "Bindings" => typeof(BindingsPage),
             "Mouse" => typeof(MousePage),
-            "Configs" => typeof(ConfigsPage),
+            "Profiles" => typeof(ProfilesPage),
             "About" => typeof(AboutPage),
             "Tutorial" => typeof(TutorialPage),
             _ => typeof(DashboardPage),

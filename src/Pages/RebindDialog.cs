@@ -83,7 +83,7 @@ public sealed class RebindDialog : ContentDialog
         var currentKeys = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6 };
         currentKeys.Children.Add(new TextBlock
         {
-            Text = "Now:",
+            Text = "Now set to:",
             VerticalAlignment = VerticalAlignment.Center,
             Foreground = Anim.Brush("TextFillColorSecondaryBrush"),
             Margin = new Thickness(0, 0, 4, 0),
@@ -101,7 +101,7 @@ public sealed class RebindDialog : ContentDialog
         var root = new StackPanel { Spacing = 14, Width = 400 };
         root.Children.Add(new TextBlock
         {
-            Text = "Press a key, or click inside the box with the mouse button you want. Esc cancels.",
+            Text = "Press a key, or click inside the box with the mouse button you want. Press Esc to cancel.",
             TextWrapping = TextWrapping.Wrap,
             Foreground = Anim.Brush("TextFillColorSecondaryBrush"),
         });
@@ -195,10 +195,10 @@ public sealed class RebindDialog : ContentDialog
         IsPrimaryButtonEnabled = true;
         IsSecondaryButtonEnabled = !current.Contains(vk);
 
-        string[] others = GameConfig.Bindings.Concat(GameConfig.Hotkeys)
-            .Where(b => b.Name != binding.Name && App.Config.Get(b.Name).Contains(vk))
+        string[] others = GameProfile.Bindings.Concat(GameProfile.Hotkeys)
+            .Where(b => b.Name != binding.Name && App.Profile.Get(b.Name).Contains(vk))
             .Select(b => b.Label).ToArray();
-        conflict.Text = others.Length == 0 ? "" : "This key is also used for: " + string.Join(", ", others) + ". Both will react.";
+        conflict.Text = others.Length == 0 ? "" : "This key is also set for: " + string.Join(", ", others) + ". Pressing it will do both.";
         conflict.Visibility = others.Length == 0 ? Visibility.Collapsed : Visibility.Visible;
     }
 }

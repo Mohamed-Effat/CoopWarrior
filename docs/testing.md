@@ -21,7 +21,7 @@ pad back through XInput. Scripts are in `tools/test/` (Windows PowerShell 5.1).
 | `PadTest.cs` | Helpers loaded with Add-Type: XInput readback (`[T]::Pads()`), key and mouse injection, window bounds, screenshots, `PrintWindow` captures. |
 | `Load-PadTest.ps1` | Dot-source it to load `PadTest.cs` and make the process DPI aware, so coordinates are physical pixels. |
 | `UiAutomation.ps1` | `Invoke-UI 'Name'` presses, selects or toggles the first matching element in the app; `Find-UI`, `Center-UI`. |
-| `Test-KeyInputs.ps1` | Holds each default key (and key pairs for diagonals) and prints the pad state. Default config, pad on. |
+| `Test-KeyInputs.ps1` | Holds each default key (and key pairs for diagonals) and prints the pad state. Default profile, pad on. |
 | `Test-MouseLook.ps1` | Short bursts of relative mouse movement; prints the stick during and after. |
 | `Capture-Frames.ps1` | Grabs several frames of the window into one contact sheet, to check animations. |
 
@@ -44,16 +44,30 @@ Engine and pad
 - [ ] Left and right Shift both give LT 255; left and right Ctrl give RT 255.
 - [ ] F9 pauses (pad neutral, amber status) and resumes; F12 removes the pad and flips the switch off.
 - [ ] Closing the window and killing the process both remove the pad.
+- [ ] Player number 1 to 4 puts the pad in XInput slot 0 to 3; "Next free player" takes the lowest free slot.
+      Changing it while on reconnects the pad in the new slot. With another pad holding the chosen slot,
+      the pad takes the next free one and the Dashboard shows a warning.
 - [ ] With the pad on and the switch focused, Space presses A and does not flip the switch.
 
 Mouse
 - [ ] With "Mouse moves a stick" on, movement tilts the chosen stick; faster tilts further; it centers within ~120 ms of stopping.
 - [ ] Cursor hold: held in the bottom-right of another window in front; free while paused or while the app is in front.
 
-Configs and UI
-- [ ] First run installs the shipped configs into `configs\` and opens the tutorial.
-- [ ] Use, New, Duplicate, Rename (with characters like `:` and `/`), Delete; `CoopWarrior.ini` keeps the active config.
-- [ ] A version 1 `keymap.txt` loads as a config.
+Profiles and UI
+- [ ] First run installs the shipped profiles into `profiles\` and opens the tutorial.
+- [ ] A data folder from version 2.0 (`configs\`, `ActiveConfig`) starts with the same profiles and the same active one.
+- [ ] Use, New, Duplicate, Rename (with characters like `:` and `/`), Delete; `CoopWarrior.ini` keeps the active profile.
+- [ ] A version 1 `keymap.txt` loads as a profile.
 - [ ] Rebind dialog: key, Alt, Tab, mouse buttons inside the box, Esc cancels, Replace, Add as extra key.
 - [ ] Light and dark theme; caption buttons visible in both.
+- [ ] Dashboard driver banner: green when ViGEmBus is installed, yellow with Install driver when it is not.
 - [ ] The published build starts (not just the `bin` build) - see decisions/0005.
+
+Installer and updates (see releasing.md)
+- [ ] `Release.ps1 -Version X` builds a Setup.exe; running it installs to `%LocalAppData%\CoopWarrior` with no admin
+      prompt, adds Start menu and desktop shortcuts and a Settings > Apps entry, and starts the app.
+- [ ] An installed copy keeps its data in `%AppData%\CoopWarrior`; About shows the version and update state.
+- [ ] Build a newer version into the same `releases\` folder, start the installed copy with
+      `COOPWARRIOR_UPDATE_SOURCE` set to it: the banner offers the update, Update and restart comes back as the
+      new version with profiles and the active profile kept.
+- [ ] With no network or no published release, the check fails quietly at start and About explains why.

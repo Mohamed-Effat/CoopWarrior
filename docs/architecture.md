@@ -7,14 +7,19 @@ keyboard / mouse ──► Engine worker thread ──► ViGEmClient.dll ──
    (GetAsyncKeyState,        builds a PadReport                                        (XInput slot 0-3)
     Raw Input)               every ~4 ms, sends on change
                                    ▲
-UI thread (WinUI 3) ──── Engine.Apply(GameConfig) ─── active game config (.kpad)
+UI thread (WinUI 3) ──── Engine.Apply(GameProfile) ─── active game profile (.kpad)
    reads Engine.Current ~30x a second for the live controller drawings
 ```
 
 ## Engine (`src/Core/Engine.cs`)
 
-- `Start()` allocates a ViGEm client, connects to the bus and adds one X360 target. Failure messages
+- `Start(player)` allocates a ViGEm client, connects to the bus and adds one X360 target. Failure messages
   are returned as strings for the Dashboard's error bar.
+- Player number: Windows gives a new pad the lowest free XInput slot. To land in slot N, `AddPad` first
+  adds spare pads until the lower free slots are filled, adds the real pad, then removes the spares.
+  A pad keeps its slot after the pads below it are removed. If slot N is already taken by another
+  controller, the pad takes the next free slot and the Dashboard says so.
+  See [decisions/0007](decisions/0007-player-number-spare-pads.md).
 - The worker thread (`CoopWarriorLoop`) runs with a 1 ms timer resolution and sleeps 4 ms per pass.
   Each pass:
   1. F12 (ExitKey) ends the loop; F9 (PauseKey) toggles pause on its rising edge.
@@ -28,8 +33,8 @@ UI thread (WinUI 3) ──── Engine.Apply(GameConfig) ─── active game 
   [decisions/0003](decisions/0003-vigem-first-report-nudge.md).
 - When the loop ends on F12, the UI timer calls `Stop()`, which removes the pad and frees the client.
   The driver also removes the pad if the process dies.
-- Settings reach the engine through `Apply(GameConfig)`: the key dictionary and `MouseSettings` are
-  swapped as whole objects (volatile fields), so the worker never sees a half-updated config.
+- Settings reach the engine through `Apply(GameProfile)`: the key dictionary and `MouseSettings` are
+  swapped as whole objects (volatile fields), so the worker never sees a half-updated profile.
 
 ## Mouse (`src/Core/MouseInput.cs`)
 
@@ -45,27 +50,41 @@ UI thread (WinUI 3) ──── Engine.Apply(GameConfig) ─── active game 
 - Mouse buttons are ordinary bindings (`LButton`, `RButton`, ...) read with `GetAsyncKeyState`;
   `MouseSettings.Buttons` turns them off.
 
-## Game configs (`src/Core/GameConfig.cs`, `ConfigStore.cs`)
+## Game profiles (`src/Core/GameProfile.cs`, `ProfileStore.cs`)
 
 - One `.kpad` text file per game: name, game process, filter, notes, every binding, mouse settings.
   The parser skips unknown lines and keeps defaults for missing ones, so hand-written files load.
-- Files on disk, relative to the folder holding `Start.bat`:
-  - `configs\*.kpad` - the user's configs.
-  - `CoopWarrior.ini` - active config file name, tutorial seen, and which shipped configs were
-    already installed (so a deleted shipped config is not copied back).
-  - `app\DefaultConfigs\*.kpad` - shipped configs, copied into `configs\` on first run.
-- `ConfigStore.RootFolder` is the parent of `app\` when it holds `Start.bat`, otherwise the exe folder.
-  That keeps user files outside `app\`, which Build.bat deletes and recreates.
+- Files in the data folder (`ProfileStore.RootFolder`):
+  - `profiles\*.kpad` - the user's profiles.
+  - `CoopWarrior.ini` - active profile file name, player number (0 = next free), tutorial seen,
+    update-check setting and time, and which shipped profiles were already installed
+    (so a deleted shipped profile is not copied back).
+- Version 2.0 used a `configs\` folder and an `ActiveConfig` key. On start, `configs\` is renamed to
+  `profiles\` when `profiles\` does not exist yet, and `ActiveConfig` is still read.
+- Shipped profiles are in `DefaultProfiles\*.kpad` next to the exe and are copied into `profiles\` once.
+- The data folder is `%AppData%\CoopWarrior` for installed copies (updates replace the program folder),
+  the folder holding `Start.bat` for portable copies, and the exe folder for builds run from source.
+
+## Installer and updates (`src/Program.cs`, `src/Core/Updater.cs`)
+
+- Velopack. `Program.Main` runs `VelopackApp.Build().Run()` before WinUI starts; Setup.exe and the
+  updater launch the exe with hook arguments that are handled there.
+- `Updater` wraps `UpdateManager` with a `GithubSource` for the public repo (or a local folder from
+  `COOPWARRIOR_UPDATE_SOURCE`). States: NotInstalled, Idle, Checking, UpToDate, Available, Downloading, Failed.
+- On start, installed copies check at most once every 20 hours unless turned off on the About page.
+  An available version shows a banner above every page; Update and restart stops the virtual pad,
+  saves settings, downloads (usually a small delta) and restarts into the new version.
+- Release packaging and publishing: `tools/release/Release.ps1`, see [releasing.md](releasing.md).
 
 ## UI (`src/MainWindow.xaml`, `src/Pages`, `src/Controls`)
 
-- PowerToys-style shell: custom title bar (status dot, active config name), Mica on Windows 11 and
-  Acrylic on Windows 10, `NavigationView` with Dashboard, Key bindings, Mouse, Game configs, and in the
+- PowerToys-style shell: custom title bar (status dot, active profile name), Mica on Windows 11 and
+  Acrylic on Windows 10, `NavigationView` with Dashboard, Key bindings, Mouse, Profiles, and in the
   footer How to use and About.
 - `MainWindow.Tick` fires every 33 ms; pages subscribe while loaded to show live state.
 - While the pad is on and not paused, the window swallows key presses that are bound to the pad,
   so they drive only the controller and not the focused control.
-- Pages read the active config when created; switching configs re-navigates to the current page.
+- Pages read the active profile when created; switching profiles re-navigates to the current page.
 - `ControllerView` draws a pad in code on a 400 x 300 canvas and animates sticks, triggers and buttons.
   The Dashboard, the Mouse page and the tutorial all use it.
 - The tutorial (`TutorialPage`) plays one looping, cancellable scene per step on a 640 x 300 stage.

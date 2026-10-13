@@ -17,8 +17,8 @@
         <ScrollViewer Grid.Row="1" Padding="{StaticResource PageContentMargin}">
             <StackPanel MaxWidth="{StaticResource PageMaxWidth}" Spacing="{StaticResource SettingsCardSpacing}">
 
-                <InfoBar x:Name="UnavailableBar" Severity="Warning" IsClosable="False" Title="Mouse movement is not available"
-                         Message="Windows did not let Co-op Warrior read the mouse. Mouse buttons still work." />
+                <InfoBar x:Name="UnavailableBar" Severity="Warning" IsClosable="False" Title="Mouse movement does not work right now"
+                         Message="Windows did not let Co-op Warrior read the mouse movement. Mouse buttons still work." />
 
                 <Border Style="{StaticResource CardStyle}" Padding="24" Margin="0,12,0,0">
                     <Grid ColumnSpacing="32">
@@ -37,7 +37,7 @@
                 </Border>
 
                 <tk:SettingsExpander x:Name="MoveExpander" Header="Mouse moves a stick" Margin="0,4,0,0"
-                                     Description="Move the mouse to tilt a stick, like turning the camera in a PC game. Settings are saved in the active game config.">
+                                     Description="Moving the mouse tilts a stick, so you can turn the camera like in a PC game. These settings are saved in the profile in use.">
                     <tk:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE962;" />
                     </tk:SettingsExpander.HeaderIcon>
@@ -49,14 +49,14 @@
                                 <ComboBoxItem Content="Left stick (movement)" />
                             </ComboBox>
                         </tk:SettingsCard>
-                        <tk:SettingsCard Header="Sensitivity" Description="Higher turns faster for the same mouse movement.">
+                        <tk:SettingsCard Header="Sensitivity" Description="A higher number turns faster when you move the mouse the same distance.">
                             <StackPanel Orientation="Horizontal" Spacing="12">
                                 <TextBlock x:Name="SensitivityText" VerticalAlignment="Center" MinWidth="28" TextAlignment="Right" />
                                 <Slider x:Name="SensitivitySlider" Width="220" Minimum="1" Maximum="10" StepFrequency="0.5" ValueChanged="Changed" />
                             </StackPanel>
                         </tk:SettingsCard>
-                        <tk:SettingsCard Header="Dead zone compensation"
-                                         Description="Games ignore small stick tilts. This makes even slow mouse moves tilt past that point. Lower it if the camera drifts, raise it if slow moves do nothing.">
+                        <tk:SettingsCard Header="Smallest tilt"
+                                         Description="Games ignore a stick that is tilted only a little. This setting makes even a slow mouse move tilt the stick far enough for the game to notice. Lower it if the camera keeps moving on its own. Raise it if slow mouse moves do nothing.">
                             <StackPanel Orientation="Horizontal" Spacing="12">
                                 <TextBlock x:Name="DeadzoneText" VerticalAlignment="Center" MinWidth="36" TextAlignment="Right" />
                                 <Slider x:Name="DeadzoneSlider" Width="220" Minimum="0" Maximum="40" StepFrequency="1" ValueChanged="Changed" />
@@ -65,8 +65,8 @@
                         <tk:SettingsCard Header="Invert up and down">
                             <ToggleSwitch x:Name="InvertToggle" Toggled="Changed" />
                         </tk:SettingsCard>
-                        <tk:SettingsCard Header="Keep the cursor in the game window"
-                                         Description="Holds the cursor in the bottom-right corner of the window in front, so clicks stay in the game. Switching to Co-op Warrior or pausing frees it.">
+                        <tk:SettingsCard Header="Keep the mouse pointer in the game window"
+                                         Description="Holds the mouse pointer in the bottom-right corner of the game window, so your clicks stay in the game. The pointer is free again when you pause or switch to Co-op Warrior.">
                             <ToggleSwitch x:Name="LockToggle" Toggled="Changed" />
                         </tk:SettingsCard>
                     </tk:SettingsExpander.Items>
@@ -74,7 +74,7 @@
 
                 <TextBlock Text="Buttons" Style="{StaticResource GroupHeaderStyle}" />
                 <tk:SettingsCard Header="Use mouse buttons"
-                                 Description="Left, right, middle and side buttons press the controller buttons set on the Key bindings page.">
+                                 Description="The left, right, middle and side mouse buttons press the controller buttons you choose on the Key bindings page.">
                     <tk:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE8B0;" />
                     </tk:SettingsCard.HeaderIcon>

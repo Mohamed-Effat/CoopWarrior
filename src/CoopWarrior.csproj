@@ -21,17 +21,20 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\CoopWarrior.ico</ApplicationIcon>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-    <Version>2.0.0</Version>
+    <Version>2.1.0</Version>
     <Product>Co-op Warrior</Product>
     <AssemblyTitle>Co-op Warrior</AssemblyTitle>
     <Authors>Mohamed Effat</Authors>
     <Company>Mohamed Effat</Company>
     <Copyright>Copyright (c) 2026 Mohamed Effat</Copyright>
+    <!-- Program.Main runs Velopack's install and update hooks before WinUI starts. -->
+    <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260921001" />
     <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.251219" />
+    <PackageReference Include="Velopack" Version="1.2.161" />
   </ItemGroup>
 
   <!-- The Windows App SDK self-contained targets copy ONNX Runtime and DirectML (about 40 MB)
@@ -42,6 +45,10 @@
 
   <ItemGroup>
     <Content Include="lib\ViGEmClient.dll" Link="ViGEmClient.dll" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="lib\ViGEmBusSetup_x64.msi" Link="ViGEmBusSetup_x64.msi" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\LICENSE" Link="LICENSE" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\LICENSE-EXCEPTION.txt" Link="LICENSE-EXCEPTION.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\THIRD-PARTY-NOTICES.txt" Link="THIRD-PARTY-NOTICES.txt" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Assets\CoopWarrior.ico" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Assets\CoopWarrior.png" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="DefaultConfigs\*.kpad" CopyToOutputDirectory="PreserveNewest" />

@@ -4,9 +4,10 @@
 | --- | --- |
 | [architecture.md](architecture.md) | How the app works: threads, data flow, files on disk. |
 | [testing.md](testing.md) | How to test against the real virtual pad, and what to be careful about. |
+| [releasing.md](releasing.md) | Building the installer, testing an update locally, publishing to GitHub Releases. |
 | [decisions/](decisions/) | One file per design decision: the context, the choice, what was rejected. |
 | [plans/](plans/) | Plans for features and larger changes, written before the work. Also the backlog. |
-| [game-configs/](game-configs/) | How to research a game and write its `.kpad` config, and notes per game. |
+| [game-profiles/](game-profiles/) | How to research a game and write its `.kpad` profile, and notes per game. |
 
 ## Naming
 

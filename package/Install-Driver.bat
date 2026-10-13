@@ -7,5 +7,5 @@ if errorlevel 1 (
   exit /b
 )
 echo Installing ViGEmBus virtual gamepad driver...
-msiexec /i "%~dp0ViGEmBusSetup_x64.msi" /passive /norestart
+msiexec /i "%~dp0app\ViGEmBusSetup_x64.msi" /passive /norestart
 echo Done.

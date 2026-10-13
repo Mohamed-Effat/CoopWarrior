@@ -42,19 +42,19 @@ public static class Driver
                 Verb = "runas",
             };
             using Process? p = Process.Start(psi);
-            if (p == null) return "Could not start the installer.";
+            if (p == null) return "Could not start the driver installer.";
             await p.WaitForExitAsync();
             // 3010: success, restart required.
-            if (p.ExitCode != 0 && p.ExitCode != 3010) return $"The installer stopped with code {p.ExitCode}.";
+            if (p.ExitCode != 0 && p.ExitCode != 3010) return $"The driver installer stopped with error code {p.ExitCode}.";
             return null;
         }
         catch (Win32Exception e) when (e.NativeErrorCode == 1223)
         {
-            return "The Windows permission prompt was cancelled.";
+            return "The driver was not installed, because Windows did not get permission. Click Install driver again and click Yes.";
         }
         catch (Exception e)
         {
-            return "Could not start the installer: " + e.Message;
+            return "Could not start the driver installer: " + e.Message;
         }
     }
 }

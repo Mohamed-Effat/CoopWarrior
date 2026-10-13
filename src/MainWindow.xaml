@@ -22,7 +22,7 @@
                         <TextBlock x:Name="StatusText" Text="Off" Style="{StaticResource CaptionTextBlockStyle}" />
                     </StackPanel>
                 </Border>
-                <TextBlock x:Name="ConfigText" Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center"
+                <TextBlock x:Name="ProfileText" Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center"
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextTrimming="CharacterEllipsis" MaxWidth="420" />
             </StackPanel>
         </Grid>
@@ -52,7 +52,7 @@
                         <FontIcon Glyph="&#xE962;" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Content="Game configs" Tag="Configs">
+                <NavigationViewItem Content="Profiles" Tag="Profiles">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE8F1;" />
                     </NavigationViewItem.Icon>
@@ -70,7 +70,19 @@
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
             </NavigationView.FooterMenuItems>
-            <Frame x:Name="ContentFrame" />
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <InfoBar x:Name="UpdateBar" Severity="Informational" IsOpen="False" Margin="40,16,40,0"
+                         Title="Update available" MaxWidth="1000">
+                    <InfoBar.ActionButton>
+                        <Button x:Name="UpdateBarButton" Content="Update and restart" Click="UpdateBarButton_Click" />
+                    </InfoBar.ActionButton>
+                </InfoBar>
+                <Frame x:Name="ContentFrame" Grid.Row="1" />
+            </Grid>
         </NavigationView>
     </Grid>
 </Window>

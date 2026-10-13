@@ -17,7 +17,7 @@ public sealed partial class BindingsPage : Page
     {
         InitializeComponent();
 
-        foreach (var group in GameConfig.Bindings.Concat(GameConfig.Hotkeys).GroupBy(b => b.Group))
+        foreach (var group in GameProfile.Bindings.Concat(GameProfile.Hotkeys).GroupBy(b => b.Group))
         {
             Groups.Children.Add(new TextBlock { Text = group.Key, Style = (Style)Application.Current.Resources["GroupHeaderStyle"] });
             foreach (Binding b in group) Groups.Children.Add(MakeCard(b));
@@ -41,7 +41,7 @@ public sealed partial class BindingsPage : Page
             ActionIcon = new FontIcon { Glyph = "" },
             ActionIconToolTip = "Change",
         };
-        if (b.Group == "Hotkeys") card.Description = "Works even while the game is in front.";
+        if (b.Group == "Hotkeys") card.Description = "Also works while the game is in front.";
         card.Click += async (_, _) => await Edit(b);
         return card;
     }
@@ -85,7 +85,7 @@ public sealed partial class BindingsPage : Page
     {
         StackPanel panel = keyPanels[name];
         panel.Children.Clear();
-        int[] codes = App.Config.Get(name);
+        int[] codes = App.Profile.Get(name);
         if (codes.Length == 0)
         {
             panel.Children.Add(new TextBlock
@@ -99,10 +99,10 @@ public sealed partial class BindingsPage : Page
         foreach (int vk in codes)
         {
             var cap = new Keycap(KeyNames.Label(vk)) { Tag = vk };
-            if (KeyNames.IsMouse(vk) && !App.Config.Mouse.Buttons)
+            if (KeyNames.IsMouse(vk) && !App.Profile.Mouse.Buttons)
             {
                 cap.Opacity = 0.4;
-                ToolTipService.SetToolTip(cap, "Mouse buttons are off on the Mouse page");
+                ToolTipService.SetToolTip(cap, "Mouse buttons are turned off on the Mouse page");
             }
             panel.Children.Add(cap);
         }
@@ -122,11 +122,11 @@ public sealed partial class BindingsPage : Page
 
     async Task Edit(Binding b)
     {
-        var dialog = new RebindDialog(b, App.Config.Get(b.Name)) { XamlRoot = XamlRoot };
+        var dialog = new RebindDialog(b, App.Profile.Get(b.Name)) { XamlRoot = XamlRoot };
         int[]? result = await dialog.PickAsync();
         if (result == null) return;
-        App.Config.Set(b.Name, result);
-        App.ConfigChanged();
+        App.Profile.Set(b.Name, result);
+        App.ProfileChanged();
         Refresh(b.Name);
     }
 
@@ -136,14 +136,14 @@ public sealed partial class BindingsPage : Page
         {
             XamlRoot = XamlRoot,
             Title = "Reset all keys?",
-            Content = "Every controller button and hotkey goes back to the default keys.",
+            Content = "Every controller button and hotkey in this profile goes back to its default key.",
             PrimaryButtonText = "Reset",
             CloseButtonText = "Cancel",
             DefaultButton = ContentDialogButton.Close,
         };
         if (await confirm.ShowAsync() != ContentDialogResult.Primary) return;
-        App.Config.ResetKeys();
-        App.ConfigChanged();
+        App.Profile.ResetKeys();
+        App.ProfileChanged();
         RefreshAll();
     }
 }

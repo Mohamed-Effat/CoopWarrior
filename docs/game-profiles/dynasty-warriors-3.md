@@ -1,6 +1,6 @@
 # DYNASTY WARRIORS 3: Complete Edition Remastered
 
-Config: `src/DefaultConfigs/Dynasty Warriors 3 Complete Edition Remastered.kpad` (ships with the app).
+Profile: `src/DefaultProfiles/Dynasty Warriors 3 Complete Edition Remastered.kpad` (ships with the app).
 
 ## Where things are
 
@@ -19,7 +19,16 @@ Config: `src/DefaultConfigs/Dynasty Warriors 3 Complete Edition Remastered.kpad`
 - `Saved\Config\CrashReportClient\UECC-Windows-*` folders appear once per launch; they are not crash
   reports. There was no `Crashes` folder.
 
-## Assumptions in the config (not confirmed in game)
+## Tested on the game PC (2026-10-14, version 2.0.1)
+
+- Two-player split-screen works and is playable with the keyboard controller.
+- With a DualSense (PS5) controller over Bluetooth connected first, the keyboard controller still got
+  XInput slot 0 (the Dashboard showed controller 1) and the game made it Player 1, with the DualSense
+  as Player 2. The DualSense did not take an XInput slot.
+- The game reads the keyboard and mouse itself and gives them to Player 1. With the keyboard as Player 1,
+  the game's own keyboard controls acted on Player 1 alongside the pad.
+
+## Assumptions in the profile (not confirmed in game)
 
 - Face buttons follow the classic Dynasty Warriors layout: X normal attack, Y charge attack,
   B Musou, A jump. Mapped to left click / J, right click / K, middle click / L, Space.

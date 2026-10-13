@@ -44,7 +44,7 @@ public sealed partial class Engine
 
     const uint VIGEM_OK = 0x20000000;
 
-    volatile Dictionary<string, int[]> map = GameConfig.DefaultKeys();
+    volatile Dictionary<string, int[]> map = GameProfile.DefaultKeys();
     volatile MouseSettings mouse = new();
     volatile bool running;
     volatile bool paused;
@@ -70,12 +70,12 @@ public sealed partial class Engine
 
     public PadReport Current { get { lock (reportLock) return current; } }
 
-    /// <summary>Takes the keys, game filter and mouse settings from a game config. Safe while running.</summary>
-    public void Apply(GameConfig c)
+    /// <summary>Takes the keys, game setting and mouse settings from a game profile. Safe while running.</summary>
+    public void Apply(GameProfile p)
     {
-        map = c.Keys;
-        mouse = c.Mouse;
-        gameProcess = c.OnlyInGame ? c.GameProcess : "";
+        map = p.Keys;
+        mouse = p.Mouse;
+        gameProcess = p.OnlyInGame ? p.GameProcess : "";
     }
 
     public static bool IsDown(int vk) => (GetAsyncKeyState(vk) & 0x8000) != 0;
@@ -93,30 +93,29 @@ public sealed partial class Engine
     }
 
     /// <summary>Starts the virtual pad. Returns null on success, otherwise a message for the user.</summary>
-    public string? Start()
+    /// <param name="player">1 to 4 to ask for that XInput slot, or 0 for the next free one.</param>
+    public string? Start(int player = 0)
     {
         if (running) return null;
         try
         {
             client = vigem_alloc();
-            if (client == IntPtr.Zero) return "The controller library failed to start.";
+            if (client == IntPtr.Zero) return "The controller library did not start.";
 
             uint err = vigem_connect(client);
             if (err != VIGEM_OK)
             {
                 Cleanup();
-                return "The virtual controller driver (ViGEmBus) is not installed or not running. " +
-                       "Install it from the Dashboard, then try again. If the installer asks for a restart, restart Windows first.";
+                return "The controller driver (ViGEmBus) is not installed or is not running. " +
+                       "Install it from the Dashboard and try again. If the driver installer asks you to restart Windows, restart first.";
             }
 
-            pad = vigem_target_x360_alloc();
-            err = vigem_target_add(client, pad);
-            if (err != VIGEM_OK)
+            string? addError = AddPad(player);
+            if (addError != null)
             {
                 Cleanup();
-                return $"Windows would not create the virtual controller (code 0x{err:X}).";
+                return addError;
             }
-            added = true;
         }
         catch (DllNotFoundException)
         {
@@ -126,16 +125,71 @@ public sealed partial class Engine
         catch (Exception e)
         {
             Cleanup();
-            return "Could not start: " + e.Message;
+            return "Could not turn on: " + e.Message;
         }
 
         timeBeginPeriod(1);
         paused = false;
-        userIndex = -1;
         running = true;
         worker = new Thread(Loop) { IsBackground = true, Name = "CoopWarriorLoop" };
         worker.Start();
         return null;
+    }
+
+    /// <summary>Adds the pad, first filling lower free slots with spare pads so it lands in the requested slot.</summary>
+    /// <remarks>
+    /// Windows gives a new pad the lowest free XInput slot, and a pad keeps its slot until it is removed,
+    /// so the spares can be removed again as soon as the pad has its slot.
+    /// When the requested slot is already taken, the pad takes the next free one.
+    /// </remarks>
+    string? AddPad(int player)
+    {
+        var spares = new List<IntPtr>();
+        try
+        {
+            while (true)
+            {
+                IntPtr target = vigem_target_x360_alloc();
+                uint err = vigem_target_add(client, target);
+                if (err != VIGEM_OK)
+                {
+                    vigem_target_free(target);
+                    return $"Windows would not create the controller (code 0x{err:X}).";
+                }
+                int slot = WaitForSlot(target);
+                if (player == 0 || slot < 0 || slot >= player - 1 || spares.Count == 3)
+                {
+                    pad = target;
+                    added = true;
+                    userIndex = slot;
+                    return null;
+                }
+                spares.Add(target);
+            }
+        }
+        finally
+        {
+            foreach (IntPtr spare in spares)
+            {
+                vigem_target_remove(client, spare);
+                vigem_target_free(spare);
+            }
+        }
+    }
+
+    /// <summary>Returns the XInput slot Windows gave a pad, or -1 when it is not known within a second.</summary>
+    int WaitForSlot(IntPtr target)
+    {
+        try
+        {
+            for (int i = 0; i < 50; i++)
+            {
+                if (vigem_target_x360_get_user_index(client, target, out uint idx) == VIGEM_OK) return (int)idx;
+                Thread.Sleep(20);
+            }
+        }
+        catch (EntryPointNotFoundException) { }
+        return -1;
     }
 
     public void Stop()

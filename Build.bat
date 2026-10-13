@@ -2,7 +2,7 @@
 rem Builds the portable Co-op Warrior folder.
 rem   Build.bat                 -> dist\CoopWarrior
 rem   Build.bat "D:\Some\Path"  -> updates that folder in place
-rem Replaces app\ and the files from package\. Leaves configs\ and CoopWarrior.ini alone.
+rem Replaces app\ and the files from package\. Leaves profiles\ and CoopWarrior.ini alone.
 setlocal
 cd /d "%~dp0"
 

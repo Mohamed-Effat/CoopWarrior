@@ -4,28 +4,35 @@ Turns a keyboard and mouse into a virtual Xbox 360 controller (ViGEmBus driver) 
 games get a second player. WinUI 3 on .NET 9, unpackaged, self-contained, x64 only.
 Started as "Keyboard Pad", then briefly "Keyboard Warrior"; `v1-winforms\` is the first version.
 
-## Build and run
+## Build, release and run
 
-- `Build.bat` publishes `src` into `dist\CoopWarrior\app` and copies `package\*` beside it.
-- `Build.bat "C:\Programs\CoopWarrior"` updates the user's installed copy in place.
-  It replaces `app\` and the package files and keeps `configs\` and `CoopWarrior.ini`.
-  Close the app first; Build.bat refuses while `CoopWarrior.exe` runs.
-- Quick compile check: `dotnet build src -c Release`. A build run from `src\bin` keeps its
-  configs next to the exe, because there is no `Start.bat` above it (see `ConfigStore.RootFolder`).
-- The .NET 9 SDK is installed on the dev PC. The game may run on a different PC from the one used for development.
+- Players install `CoopWarrior-win-Setup.exe` (Velopack). It installs per-user to
+  `%LocalAppData%\CoopWarrior` and updates itself from GitHub Releases of
+  `github.com/Mohamed-Effat/CoopWarrior`. Their data is in `%AppData%\CoopWarrior`.
+- `tools\release\Release.ps1 -Version X.Y.Z` builds the installer and update packages into `releases\`;
+  add `-Publish` to upload a GitHub Release. Publishing reaches every player - only when the user asks.
+  Full steps, including testing an update locally first, in docs/releasing.md.
+- Quick compile check: `dotnet build src -c Release`. A build run from `src\bin` keeps its data next to the exe.
+- `Build.bat` builds a portable folder (`dist\CoopWarrior`, or a folder given as argument) for local tests;
+  portable copies keep data next to `Start.bat` and do not update themselves.
+- The .NET 9 SDK and `vpk` 1.2.161 are installed on the dev PC. The game may run on a different PC.
 
 ## Layout
 
 - `src\Core\` - engine and data, no UI:
   `Engine` (worker loop, ViGEm calls), `MouseInput` (Raw Input, cursor hold),
-  `GameConfig` (.kpad format), `ConfigStore` (configs folder, active config, CoopWarrior.ini),
-  `KeyNames`, `Driver`.
+  `GameProfile` (.kpad format), `ProfileStore` (data folder, active profile, CoopWarrior.ini),
+  `Updater` (Velopack checks and updates), `KeyNames`, `Driver`.
+- `src\Program.cs` - entry point: Velopack hooks first, then WinUI.
 - `src\Pages\` - one page per navigation item, plus `RebindDialog`.
 - `src\Controls\` - `ControllerView` (drawn pad), `Keycap`, `Anim` (awaitable storyboards).
-- `src\DefaultConfigs\*.kpad` - configs shipped with the app, installed into `configs\` once.
-- `package\` - files that sit next to `app\` in the portable folder (Start.bat, driver MSI, user README).
-- `tools\test\` - scripts for testing against the real virtual pad (see docs/testing.md).
-- `docs\` - architecture, decisions, plans, game-config research. See docs/README.md.
+- `src\DefaultProfiles\*.kpad` - profiles shipped with the app, installed into `profiles\` once.
+- `src\lib\` - ViGEmClient.dll and the ViGEmBus driver MSI, both shipped inside the app.
+- `package\` - files that sit next to `app\` in the portable folder only (Start.bat, Install-Driver.bat, README).
+- `tools\release\` - `Release.ps1`. `tools\test\` - scripts for testing against the real virtual pad.
+- `LICENSE` (GPL-3.0, verbatim), `LICENSE-EXCEPTION.txt` (section 7 permission for Microsoft libraries),
+  `THIRD-PARTY-NOTICES.txt`. All three ship inside the app.
+- `docs\` - architecture, decisions, plans, game-profile research. See docs/README.md.
 
 ## Things that bite
 
@@ -42,6 +49,12 @@ Started as "Keyboard Pad", then briefly "Keyboard Warrior"; `v1-winforms\` is th
   missing and the app crashes on start. A post-publish target deletes ONNX Runtime and DirectML (~40 MB).
 - **Bound keys are swallowed** by the window while the pad is on (`MainWindow` PreviewKeyDown), so
   Space cannot flip the focused toggle.
+- **Entry point**: `DISABLE_XAML_GENERATED_MAIN` is set; `Program.Main` must call `VelopackApp.Build().Run()`
+  before anything else, because Setup.exe and the updater launch the exe with hook arguments.
+- **Data location** depends on how the app runs (`ProfileStore.RootFolder`): installed -> `%AppData%\CoopWarrior`,
+  portable -> folder with `Start.bat`, source build -> exe folder. Never store user data in the program folder
+  of an installed copy; updates replace it.
+- **Versions**: `vpk` and the `Velopack` package must stay on the same version.
 
 ## Testing
 
@@ -61,6 +74,6 @@ short, and prefer UI Automation and `PrintWindow` captures, which do not touch t
 
 - New feature or larger change: write a plan in `docs/plans/` first (template there).
 - A design choice with a rejected alternative worth remembering: add a file to `docs/decisions/`.
-- New game config: research notes in `docs/game-configs/<game>.md`, the config in `src/DefaultConfigs/`
-  if it ships with the app, otherwise in the user's `C:\Programs\CoopWarrior\configs\`.
+- New game profile: research notes in `docs/game-profiles/<game>.md`, the profile in `src/DefaultProfiles/`
+  if it ships with the app, otherwise in the user's `%AppData%\CoopWarrior\profiles\`.
 - Keep `package\README.txt` (for players) and `README.md` (for developers) in step with behavior changes.

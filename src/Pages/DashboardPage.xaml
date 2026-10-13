@@ -17,66 +17,76 @@
         <ScrollViewer Grid.Row="1" Padding="{StaticResource PageContentMargin}">
             <StackPanel MaxWidth="{StaticResource PageMaxWidth}" HorizontalAlignment="Stretch" Spacing="{StaticResource SettingsCardSpacing}">
 
-                <InfoBar x:Name="DriverBar" Severity="Warning" IsClosable="False"
-                         Title="Driver not installed"
-                         Message="Co-op Warrior needs the free ViGEmBus driver to create a virtual controller. You install it once per PC.">
+                <InfoBar x:Name="DriverBar" IsClosable="False" IsOpen="True" Margin="0,12,0,0">
                     <InfoBar.ActionButton>
                         <Button x:Name="InstallButton" Content="Install driver" Click="Install_Click" />
                     </InfoBar.ActionButton>
                 </InfoBar>
 
-                <InfoBar x:Name="ErrorBar" Severity="Error" IsOpen="False" Title="Could not start" />
+                <InfoBar x:Name="ErrorBar" Severity="Error" IsOpen="False" Title="Could not turn on" />
 
-                <!-- Hero -->
-                <Border Style="{StaticResource CardStyle}" Padding="24" Margin="0,12,0,0">
+                <!-- The main switch -->
+                <Border Style="{StaticResource CardStyle}" Padding="28,24" Margin="0,4,0,0">
                     <Grid ColumnSpacing="32">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <Grid Width="300" Height="225">
+                        <Grid Width="280" Height="210" VerticalAlignment="Center">
                             <c:ControllerView x:Name="Pad" />
                         </Grid>
-                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="8">
-                            <TextBlock x:Name="Headline" Style="{StaticResource SubtitleTextBlockStyle}" Text="The virtual controller is off" TextWrapping="Wrap" />
-                            <TextBlock x:Name="Detail" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap"
-                                       Text="Turn it on and your keyboard and mouse become a second Xbox controller, ready for split-screen games." />
-                            <StackPanel x:Name="SlotPanel" Orientation="Horizontal" Spacing="8" Visibility="Collapsed" Margin="0,4,0,0">
-                                <FontIcon Glyph="&#xE7FC;" FontSize="16" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-                                <TextBlock x:Name="SlotText" Style="{StaticResource BodyStrongTextBlockStyle}" />
-                            </StackPanel>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="10">
+                            <TextBlock Text="Turn keyboard into a controller" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="Wrap" />
+                            <ToggleSwitch x:Name="PadToggle" Toggled="PadToggle_Toggled" OnContent="On" OffContent="Off"
+                                          AutomationProperties.Name="Turn keyboard into a controller"
+                                          RenderTransformOrigin="0,0.5" Margin="0,4,0,4">
+                                <ToggleSwitch.RenderTransform>
+                                    <ScaleTransform ScaleX="1.4" ScaleY="1.4" />
+                                </ToggleSwitch.RenderTransform>
+                            </ToggleSwitch>
+                            <TextBlock x:Name="Headline" Style="{StaticResource BodyStrongTextBlockStyle}" TextWrapping="Wrap" />
+                            <TextBlock x:Name="Detail" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
                         </StackPanel>
                     </Grid>
                 </Border>
 
-                <tk:SettingsCard Header="Game config" Margin="0,4,0,0"
-                                 Description="Keys, mouse and game settings for one game. Manage them on the Game configs page.">
+                <tk:SettingsCard Header="Player number" Margin="0,4,0,0"
+                                 Description="Which player your keyboard is in the game.">
+                    <tk:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE716;" />
+                    </tk:SettingsCard.HeaderIcon>
+                    <ComboBox x:Name="PlayerBox" MinWidth="220" SelectionChanged="PlayerBox_SelectionChanged"
+                              AutomationProperties.Name="Player number">
+                        <ComboBoxItem Content="Next free player" />
+                        <ComboBoxItem Content="Player 1" />
+                        <ComboBoxItem Content="Player 2" />
+                        <ComboBoxItem Content="Player 3" />
+                        <ComboBoxItem Content="Player 4" />
+                    </ComboBox>
+                </tk:SettingsCard>
+
+                <InfoBar x:Name="PlayerBar" Severity="Warning" IsClosable="False" IsOpen="False" />
+
+                <tk:SettingsCard Header="Game profile"
+                                 Description="The keys and mouse settings for one game. You can add and change profiles on the Profiles page.">
                     <tk:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE8F1;" />
                     </tk:SettingsCard.HeaderIcon>
-                    <ComboBox x:Name="ConfigBox" MinWidth="260" MaxWidth="440" DisplayMemberPath="Name"
-                              SelectionChanged="ConfigBox_SelectionChanged" />
+                    <ComboBox x:Name="ProfileBox" MinWidth="260" MaxWidth="440" DisplayMemberPath="Name"
+                              SelectionChanged="ProfileBox_SelectionChanged" AutomationProperties.Name="Game profile" />
                 </tk:SettingsCard>
 
                 <InfoBar x:Name="NotesBar" Severity="Informational" IsClosable="False" Title="Tips for this game" />
 
-                <tk:SettingsCard Header="Virtual controller"
-                                 Description="Adds an Xbox 360 controller that your keyboard and mouse drive.">
-                    <tk:SettingsCard.HeaderIcon>
-                        <FontIcon Glyph="&#xE7FC;" />
-                    </tk:SettingsCard.HeaderIcon>
-                    <ToggleSwitch x:Name="PadToggle" Toggled="PadToggle_Toggled" />
-                </tk:SettingsCard>
-
                 <TextBlock Text="Game" Style="{StaticResource GroupHeaderStyle}" />
                 <tk:SettingsExpander x:Name="FilterExpander" Header="Only work while the game is in front"
-                                     Description="Ignore your keys when you switch to another window.">
+                                     Description="When you switch to another window, your keys work as normal keys again.">
                     <tk:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE71C;" />
                     </tk:SettingsExpander.HeaderIcon>
                     <ToggleSwitch x:Name="OnlyToggle" Toggled="OnlyToggle_Toggled" />
                     <tk:SettingsExpander.Items>
-                        <tk:SettingsCard Header="Game program" Description="Start the game, then pick it from the list.">
+                        <tk:SettingsCard Header="Game program" Description="Start the game first, then pick it from the list.">
                             <ComboBox x:Name="ProcBox" IsEditable="True" MinWidth="220" PlaceholderText="Pick a program"
                                       DropDownOpened="ProcBox_DropDownOpened"
                                       TextSubmitted="ProcBox_TextSubmitted"
@@ -86,13 +96,13 @@
                 </tk:SettingsExpander>
 
                 <TextBlock Text="Hotkeys" Style="{StaticResource GroupHeaderStyle}" />
-                <tk:SettingsCard Header="Pause or resume" Description="Lets you type normally without switching the controller off.">
+                <tk:SettingsCard Header="Pause or resume" Description="While paused, you can type normally and the controller stays connected.">
                     <tk:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE769;" />
                     </tk:SettingsCard.HeaderIcon>
                     <StackPanel x:Name="PauseKeys" Orientation="Horizontal" Spacing="4" />
                 </tk:SettingsCard>
-                <tk:SettingsCard Header="Stop" Description="Turns the virtual controller off. Both hotkeys work while the game is in front.">
+                <tk:SettingsCard Header="Turn off" Description="Turns the keyboard controller off. Both hotkeys also work while the game is in front.">
                     <tk:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE71A;" />
                     </tk:SettingsCard.HeaderIcon>
@@ -100,13 +110,14 @@
                 </tk:SettingsCard>
 
                 <TextBlock Text="Help" Style="{StaticResource GroupHeaderStyle}" />
-                <tk:SettingsCard Header="How to use" Description="A short animated walkthrough, from installing the driver to playing."
+                <tk:SettingsCard Header="How to use" Description="A short animated guide, from installing the driver to playing."
                                  IsClickEnabled="True" Click="Tutorial_Click">
                     <tk:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE897;" />
                     </tk:SettingsCard.HeaderIcon>
                 </tk:SettingsCard>
-                <tk:SettingsCard Header="Check controllers in Windows" Description="Opens the Game Controllers panel, where both pads should be listed."
+                <tk:SettingsCard Header="See controllers in Windows"
+                                 Description="Opens the Windows Game Controllers window. When the keyboard controller is on, it is listed there as an Xbox 360 controller."
                                  IsClickEnabled="True" Click="JoyCpl_Click">
                     <tk:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE9F5;" />

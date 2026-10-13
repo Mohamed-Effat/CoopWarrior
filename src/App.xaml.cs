@@ -11,17 +11,17 @@ public partial class App : Application
 
     static Mutex? instanceMutex;
 
-    public static ConfigStore Store { get; private set; } = null!;
+    public static ProfileStore Store { get; private set; } = null!;
     public static Engine Engine { get; } = new();
 
-    /// <summary>The active game config.</summary>
-    public static GameConfig Config => Store.Active;
+    /// <summary>The active game profile.</summary>
+    public static GameProfile Profile => Store.Active;
 
-    /// <summary>Saves the active config and passes its settings to the engine.</summary>
-    public static void ConfigChanged()
+    /// <summary>Saves the active profile and passes its settings to the engine.</summary>
+    public static void ProfileChanged()
     {
-        Config.Save();
-        Engine.Apply(Config);
+        Profile.Save();
+        Engine.Apply(Profile);
     }
     public static MainWindow? Window { get; private set; }
 
@@ -40,9 +40,9 @@ public partial class App : Application
             return;
         }
 
-        Store = ConfigStore.Load();
-        Engine.Apply(Config);
-        Store.ActiveChanged += () => Engine.Apply(Config);
+        Store = ProfileStore.Load();
+        Engine.Apply(Profile);
+        Store.ActiveChanged += () => Engine.Apply(Profile);
         Window = new MainWindow();
         Window.Activate();
     }

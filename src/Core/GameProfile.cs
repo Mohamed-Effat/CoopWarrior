@@ -19,7 +19,7 @@ public sealed record MouseSettings(
     bool LockCursor = true);
 
 /// <summary>One game's settings: key bindings, mouse options and the game filter, saved as a .kpad text file.</summary>
-public sealed class GameConfig
+public sealed class GameProfile
 {
     public const string Extension = ".kpad";
 
@@ -53,12 +53,12 @@ public sealed class GameConfig
 
     public static readonly Binding[] Hotkeys =
     [
-        new("PauseKey", "Pause / resume", "Hotkeys", "F9"),
-        new("ExitKey",  "Stop",           "Hotkeys", "F12"),
+        new("PauseKey", "Pause or resume", "Hotkeys", "F9"),
+        new("ExitKey",  "Turn off",         "Hotkeys", "F12"),
     ];
 
     public string FilePath { get; set; } = "";
-    public string Name { get; set; } = "New config";
+    public string Name { get; set; } = "New profile";
     public string GameProcess { get; set; } = "";
     public bool OnlyInGame { get; set; }
     public List<string> Notes { get; set; } = [];
@@ -84,7 +84,7 @@ public sealed class GameConfig
 
     public void ResetKeys() => Keys = DefaultKeys();
 
-    public GameConfig Clone(string name) => new()
+    public GameProfile Clone(string name) => new()
     {
         Name = name,
         GameProcess = GameProcess,
@@ -94,7 +94,7 @@ public sealed class GameConfig
         Mouse = Mouse,
     };
 
-    public static GameConfig Load(string path)
+    public static GameProfile Load(string path)
     {
         var c = Parse(File.ReadAllLines(path));
         c.FilePath = path;
@@ -104,9 +104,9 @@ public sealed class GameConfig
 
     /// <summary>Reads the .kpad format. Unknown names and keys are skipped so hand-written files load.</summary>
     /// <remarks>Version 1 keymap.txt files are a subset of this format and load too.</remarks>
-    public static GameConfig Parse(IEnumerable<string> lines)
+    public static GameProfile Parse(IEnumerable<string> lines)
     {
-        var c = new GameConfig { Name = "" };
+        var c = new GameProfile { Name = "" };
         var keys = DefaultKeys();
         var mouse = new MouseSettings();
         bool onlySet = false;
@@ -152,7 +152,7 @@ public sealed class GameConfig
     public string ToText()
     {
         var sb = new StringBuilder();
-        sb.AppendLine("# Co-op Warrior game config. Edit it in the app, or by hand in any text editor.");
+        sb.AppendLine("# Co-op Warrior game profile. Edit it in the app, or by hand in any text editor.");
         sb.AppendLine("# Lines starting with # are ignored. Format:  Setting = value");
         sb.AppendLine("# Key names: A-Z, D0-D9, Space, Return, Tab, Back, Up, Down, Left, Right, ShiftKey, ControlKey,");
         sb.AppendLine("#   Menu (Alt), F1-F12, LButton, RButton, MButton, XButton1, XButton2. Separate several keys with commas.");

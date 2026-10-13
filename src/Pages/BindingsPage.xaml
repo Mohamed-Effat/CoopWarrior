@@ -23,7 +23,7 @@
         <ScrollViewer Grid.Row="1" Padding="{StaticResource PageContentMargin}">
             <StackPanel MaxWidth="{StaticResource PageMaxWidth}">
                 <TextBlock Margin="1,8,0,0" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                           Text="Click a button to change its key. One controller button can have several keys or mouse buttons. Keys light up while you hold them." />
+                           Text="Click a row to change its key. One controller button can have several keys and mouse buttons. A key lights up while you hold it down." />
                 <StackPanel x:Name="Groups" Spacing="{StaticResource SettingsCardSpacing}" />
             </StackPanel>
         </ScrollViewer>

@@ -1,4 +1,4 @@
-# 0004. Game configs as .kpad text files
+# 0004. Game profiles as .kpad text files
 
 - Date: 2026-10-13
 - Status: Accepted
@@ -6,14 +6,14 @@
 ## Context
 
 Each game needs its own keys, mouse settings and game filter. The user wants to import and export them,
-and to ask Claude to write a config for a new game.
+and to ask Claude to write a profile for a new game.
 
 ## Decision
 
 One plain-text file per game, `Setting = value` per line, `#` comments, repeated `Note =` lines for tips.
 Key names are the WinForms `Keys` names version 1 used (`ShiftKey`, `Return`, `LButton`), plus aliases
 such as `Shift`, `Enter`, `Alt`. Unknown lines are skipped and missing settings keep their defaults.
-Files live in `configs\` next to `Start.bat`. The extension `.kpad` is kept from the "Keyboard Pad" name
+Files live in `profiles\` next to `Start.bat`. The extension `.kpad` is kept from the "Keyboard Pad" name
 so existing files keep working.
 
 ## Alternatives considered

@@ -1,4 +1,4 @@
-# Co-op Warrior game config. Edit it in the app, or by hand in any text editor.
+# Co-op Warrior game profile. Edit it in the app, or by hand in any text editor.
 # Lines starting with # are ignored. Format:  Setting = value
 # Key names: A-Z, D0-D9, Space, Return, Tab, Back, Up, Down, Left, Right, ShiftKey, ControlKey,
 #   Menu (Alt), F1-F12, LButton, RButton, MButton, XButton1, XButton2. Separate several keys with commas.

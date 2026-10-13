@@ -8,9 +8,9 @@ using Windows.Storage.Pickers;
 
 namespace CoopWarrior.Pages;
 
-public sealed partial class ConfigsPage : Page
+public sealed partial class ProfilesPage : Page
 {
-    public ConfigsPage()
+    public ProfilesPage()
     {
         InitializeComponent();
         Build();
@@ -26,27 +26,27 @@ public sealed partial class ConfigsPage : Page
     void Build()
     {
         List.Children.Clear();
-        foreach (GameConfig c in App.Store.Configs) List.Children.Add(Card(c));
+        foreach (GameProfile p in App.Store.Profiles) List.Children.Add(Card(p));
     }
 
-    static string Describe(GameConfig c)
+    static string Describe(GameProfile p)
     {
         var parts = new List<string>
         {
-            c.GameProcess.Length > 0 ? "Game: " + c.GameProcess + ".exe" + (c.OnlyInGame ? " (only while in front)" : "") : "Any program",
-            c.Mouse.Stick switch
+            p.GameProcess.Length > 0 ? "Game: " + p.GameProcess + ".exe" + (p.OnlyInGame ? " (only while it is in front)" : "") : "Works in any program",
+            p.Mouse.Stick switch
             {
-                MouseStick.Right => "mouse turns the camera",
-                MouseStick.Left => "mouse moves",
+                MouseStick.Right => "the mouse turns the camera",
+                MouseStick.Left => "the mouse moves your player",
                 _ => "keyboard only",
             },
         };
-        return string.Join("  ·  ", parts) + "\n" + c.FileName;
+        return string.Join("  ·  ", parts) + "\n" + p.FileName;
     }
 
-    SettingsCard Card(GameConfig c)
+    SettingsCard Card(GameProfile p)
     {
-        bool active = c == App.Config;
+        bool active = p == App.Profile;
         var right = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
         if (active)
         {
@@ -58,31 +58,31 @@ public sealed partial class ConfigsPage : Page
         else
         {
             var use = new Button { Content = "Use" };
-            use.Click += (_, _) => App.Store.Activate(c);
+            use.Click += (_, _) => App.Store.Activate(p);
             right.Children.Add(use);
         }
 
         var more = new Button { Content = new FontIcon { Glyph = "", FontSize = 14 }, Padding = new Thickness(8) };
         ToolTipService.SetToolTip(more, "More");
-        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(more, "More options for " + c.Name);
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(more, "More options for " + p.Name);
         var menu = new MenuFlyout();
-        menu.Items.Add(Item("Rename", "", async () => await Rename(c)));
-        menu.Items.Add(Item("Duplicate", "", async () => await Duplicate(c)));
-        menu.Items.Add(Item("Export...", "", async () => await Export(c)));
+        menu.Items.Add(Item("Rename", "", async () => await Rename(p)));
+        menu.Items.Add(Item("Make a copy", "", async () => await Duplicate(p)));
+        menu.Items.Add(Item("Export to a file...", "", async () => await Export(p)));
         menu.Items.Add(new MenuFlyoutSeparator());
-        menu.Items.Add(Item("Delete", "", async () => await Delete(c)));
+        menu.Items.Add(Item("Delete", "", async () => await Delete(p)));
         more.Flyout = menu;
         right.Children.Add(more);
 
         var card = new SettingsCard
         {
-            Header = c.Name,
-            Description = Describe(c),
+            Header = p.Name,
+            Description = Describe(p),
             HeaderIcon = new FontIcon { Glyph = active ? "" : "" },
             Content = right,
             IsClickEnabled = !active,
         };
-        if (!active) card.Click += (_, _) => App.Store.Activate(c);
+        if (!active) card.Click += (_, _) => App.Store.Activate(p);
         return card;
     }
 
@@ -120,54 +120,54 @@ public sealed partial class ConfigsPage : Page
 
     async void New_Click(object sender, RoutedEventArgs e)
     {
-        string? name = await AskName("New game config", "", "Create");
+        string? name = await AskName("New profile", "", "Create");
         if (name == null) return;
-        GameConfig c = App.Store.Create(name);
-        App.Store.Activate(c);
-        Show($"Created \"{c.Name}\" with the default keys and switched to it. Set its game on the Dashboard and its keys on Key bindings.");
+        GameProfile p = App.Store.Create(name);
+        App.Store.Activate(p);
+        Show($"Created \"{p.Name}\" with the default keys, and it is now in use. Choose its game on the Dashboard and its keys on the Key bindings page.");
     }
 
-    async Task Rename(GameConfig c)
+    async Task Rename(GameProfile p)
     {
-        string? name = await AskName("Rename config", c.Name, "Rename");
-        if (name == null || name == c.Name) return;
-        App.Store.Rename(c, name);
+        string? name = await AskName("Rename profile", p.Name, "Rename");
+        if (name == null || name == p.Name) return;
+        App.Store.Rename(p, name);
     }
 
-    async Task Duplicate(GameConfig c)
+    async Task Duplicate(GameProfile p)
     {
-        string? name = await AskName("Duplicate config", c.Name + " copy", "Duplicate");
+        string? name = await AskName("Make a copy", p.Name + " copy", "Make copy");
         if (name == null) return;
-        GameConfig copy = App.Store.Duplicate(c, name);
-        Show($"Made \"{copy.Name}\".");
+        GameProfile copy = App.Store.Duplicate(p, name);
+        Show($"Made a copy called \"{copy.Name}\".");
     }
 
-    async Task Delete(GameConfig c)
+    async Task Delete(GameProfile p)
     {
         var dialog = new ContentDialog
         {
             XamlRoot = XamlRoot,
-            Title = $"Delete \"{c.Name}\"?",
-            Content = "Its file is deleted from the configs folder. Export it first if you want to keep a copy.",
+            Title = $"Delete \"{p.Name}\"?",
+            Content = "Its file is deleted from the profiles folder. If you want to keep a copy, export it first.",
             PrimaryButtonText = "Delete",
             CloseButtonText = "Cancel",
             DefaultButton = ContentDialogButton.Close,
         };
         if (await dialog.ShowAsync() != ContentDialogResult.Primary) return;
-        App.Store.Delete(c);
+        App.Store.Delete(p);
     }
 
-    async Task Export(GameConfig c)
+    async Task Export(GameProfile p)
     {
         try
         {
-            var picker = new FileSavePicker { SuggestedFileName = Path.GetFileNameWithoutExtension(c.FilePath) };
-            picker.FileTypeChoices.Add("Co-op Warrior game config", [GameConfig.Extension]);
+            var picker = new FileSavePicker { SuggestedFileName = Path.GetFileNameWithoutExtension(p.FilePath) };
+            picker.FileTypeChoices.Add("Co-op Warrior profile", [GameProfile.Extension]);
             WinRT.Interop.InitializeWithWindow.Initialize(picker, WinRT.Interop.WindowNative.GetWindowHandle(App.Window));
             var file = await picker.PickSaveFileAsync();
             if (file == null) return;
-            ConfigStore.Export(c, file.Path);
-            Show($"Saved \"{c.Name}\" to {file.Path}");
+            ProfileStore.Export(p, file.Path);
+            Show($"Saved \"{p.Name}\" to {file.Path}");
         }
         catch (Exception ex)
         {
@@ -181,7 +181,7 @@ public sealed partial class ConfigsPage : Page
         try
         {
             var picker = new FileOpenPicker();
-            picker.FileTypeFilter.Add(GameConfig.Extension);
+            picker.FileTypeFilter.Add(GameProfile.Extension);
             picker.FileTypeFilter.Add(".txt");
             WinRT.Interop.InitializeWithWindow.Initialize(picker, WinRT.Interop.WindowNative.GetWindowHandle(App.Window));
             var file = await picker.PickSingleFileAsync();
@@ -190,22 +190,22 @@ public sealed partial class ConfigsPage : Page
         }
         catch (Exception ex)
         {
-            Show("Could not open the file picker: " + ex.Message, InfoBarSeverity.Error);
+            Show("Could not open the file window: " + ex.Message, InfoBarSeverity.Error);
             return;
         }
-        GameConfig? c = App.Store.Import(path);
-        if (c == null)
+        GameProfile? p = App.Store.Import(path);
+        if (p == null)
         {
             Show("Could not read that file.", InfoBarSeverity.Error);
             return;
         }
-        App.Store.Activate(c);
-        Show($"Imported \"{c.Name}\" and switched to it.");
+        App.Store.Activate(p);
+        Show($"Imported \"{p.Name}\", and it is now in use.");
     }
 
     void OpenFolder_Click(object sender, RoutedEventArgs e)
     {
-        try { Process.Start(new ProcessStartInfo("explorer.exe", $"\"{ConfigStore.ConfigsFolder}\"") { UseShellExecute = true }); }
+        try { Process.Start(new ProcessStartInfo("explorer.exe", $"\"{ProfileStore.ProfilesFolder}\"") { UseShellExecute = true }); }
         catch (Exception) { }
     }
 }

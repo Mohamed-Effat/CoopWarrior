@@ -1,13 +1,13 @@
 # Single-file installer and automatic updates
 
 - Date: 2026-10-13
-- Status: Draft
+- Status: In progress (built and tested locally; not yet published)
 
 ## Goal
 
 Players download one `CoopWarrior-win-Setup.exe` that installs everything, with no admin prompt
 except the one-time controller driver. The installed app finds new versions on GitHub Releases and
-updates itself, keeping the player's configs.
+updates itself, keeping the player's profiles.
 
 ## Decisions already made
 
@@ -23,8 +23,8 @@ updates itself, keeping the player's configs.
 - **Custom entry point.** Velopack's hooks must run before WinUI starts, so add `Program.cs` with
   `[STAThread] Main` that calls `VelopackApp.Build()...Run()` first, then starts the WinUI `App`.
   Set `DISABLE_XAML_GENERATED_MAIN` in the project.
-- **User data location.** `ConfigStore.RootFolder` becomes `%AppData%\CoopWarrior` for installed
-  copies (configs, `CoopWarrior.ini`). A build run from `src\bin` keeps using its own folder.
+- **User data location.** `ProfileStore.RootFolder` becomes `%AppData%\CoopWarrior` for installed
+  copies (profiles, `CoopWarrior.ini`). A build run from `src\bin` keeps using its own folder.
 - **Driver.** Ship `ViGEmBusSetup_x64.msi` inside the app. On first run (`OnFirstRun`), the Dashboard
   opens with the driver step if the driver is missing. The existing Install driver button runs the MSI.
 - **Updates UI.**
@@ -58,24 +58,28 @@ updates itself, keeping the player's configs.
 
 ## Steps
 
-- [ ] Scrub personal paths from docs; add ViGEmBus license; choose and add the project license
-- [ ] Create the public GitHub repo and push
-- [ ] `Program.cs` entry point with Velopack; data folder moves to `%AppData%`
-- [ ] Ship the driver MSI inside the app; first-run driver step
-- [ ] Updates section on About; startup check and Dashboard InfoBar; setting to turn checks off
-- [ ] `Release.ps1` and `docs/releasing.md`; install `vpk` (`dotnet tool install -g vpk`)
-- [ ] Release 2.0.0 (first installer), install it from the Setup.exe on this PC
-- [ ] Release 2.0.1 with a visible change; confirm the installed 2.0.0 finds it, updates and keeps configs
-- [ ] Move the player's existing configs from `C:\Programs\CoopWarrior\configs` to `%AppData%`
-- [ ] Update CLAUDE.md, architecture.md, the player README
+- [x] Scrub personal paths from docs; add ViGEmBus license; license chosen: GPL-3.0 with a section 7
+      permission for Microsoft libraries (`LICENSE`, `LICENSE-EXCEPTION.txt`, `THIRD-PARTY-NOTICES.txt`)
+- [ ] Create the public GitHub repo and push (waiting for the user's go-ahead)
+- [x] `Program.cs` entry point with Velopack; data folder moves to `%AppData%`
+- [x] Ship the driver MSI inside the app (the existing Dashboard banner and tutorial cover the driver step)
+- [x] Updates section on About; startup check and a banner above every page; setting to turn checks off
+- [x] `Release.ps1` and `docs/releasing.md`; `vpk` 1.2.161 installed
+- [x] Release 2.0.0 locally, installed from the Setup.exe on this PC (79 MB installer)
+- [x] Release 2.0.1 locally (friendlier update-check errors); installed 2.0.0 found it through
+      `COOPWARRIOR_UPDATE_SOURCE`, downloaded a 0.21 MB delta, restarted as 2.0.1, kept profiles and settings
+- [x] The player's old portable profiles were the shipped defaults; nothing to move
+- [x] Update CLAUDE.md, architecture.md, README.md, decision 0006
+- [ ] Publish 2.0.0 or later to GitHub and confirm an installed copy updates from GitHub itself
+- [ ] Uninstall test (not run, to keep the installed copy)
 
 ## Testing
 
 - Fresh install on this PC from the downloaded Setup.exe: shortcut, uninstall entry, first-run tutorial,
   driver step when the driver is missing (check on a PC without ViGEmBus).
-- Update from 2.0.0 to 2.0.1: delta download, restart, configs and active config kept.
+- Update from 2.0.0 to 2.0.1: delta download, restart, profiles and active profile kept.
 - Update while the pad is on: pad removed cleanly, comes back after restart only when switched on.
-- Uninstall: app and shortcuts removed; `%AppData%\CoopWarrior` kept (configs survive a reinstall).
+- Uninstall: app and shortcuts removed; `%AppData%\CoopWarrior` kept (profiles survive a reinstall).
 
 ## Out of scope
 

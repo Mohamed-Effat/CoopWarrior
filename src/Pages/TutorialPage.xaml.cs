@@ -28,41 +28,42 @@ public sealed partial class TutorialPage : Page
 
         steps =
         [
-            new("Install the driver (once per PC)",
-                "Co-op Warrior needs the free ViGEmBus driver. If the Dashboard shows a yellow \"Driver not installed\" message, " +
-                "click Install driver and answer Yes in the Windows prompt. You only do this once on each PC.",
+            new("Install the controller driver (once on each PC)",
+                "Co-op Warrior needs the free ViGEmBus driver. If the Dashboard shows a yellow message saying the driver is not installed, " +
+                "click Install driver. When Windows asks for permission, click Yes. When the driver is installed, the message turns green.",
                 SceneDriver),
-            new("Connect your real controller first",
-                "Plug in or switch on your real controller before you turn the keyboard pad on. " +
-                "Windows numbers controllers in the order they connect, so your real controller becomes Player 1.",
+            new("Choose your player number",
+                "Your keyboard can be any player from 1 to 4. Choose the number under Player number on the Dashboard. " +
+                "If you choose Next free player, the keyboard takes the first free number. In that case, connect your real controller first " +
+                "if it should be Player 1.",
                 SceneRealPad),
-            new("Turn on the virtual controller",
-                "On the Dashboard, switch Virtual controller on. A second controller appears: your keyboard and mouse. " +
-                "The dot next to the title turns green while it is on.",
+            new("Turn your keyboard into a controller",
+                "On the Dashboard, turn on \"Turn keyboard into a controller\". Windows now sees one more controller: your keyboard and mouse. " +
+                "The dot at the top of the window is green while it is on.",
                 SceneToggle),
-            new("Pick the config for your game",
-                "A game config holds the keys, mouse settings and game filter for one game. Choose your game at the top of the Dashboard, " +
-                "or on the Game configs page, where you can also make new ones and import or export config files.",
-                SceneConfigs),
-            new("Start the game and pick two players",
-                "Start the game after the keyboard pad is on, then choose a two-player or split-screen mode. " +
-                "Each player presses Start on their own controller to join.",
+            new("Pick the profile for your game",
+                "A profile holds the keys and mouse settings for one game. Choose your game under Game profile on the Dashboard. " +
+                "On the Profiles page you can also make new profiles, and import or export profile files.",
+                SceneProfiles),
+            new("Start the game and choose two players",
+                "Start the game after your keyboard is a controller. Then choose a two-player or split-screen mode. " +
+                $"Each player presses Start on their own controller to join. On the keyboard, Start is {Keys("Start")}.",
                 SceneSplitScreen),
             new("Play with your keyboard",
-                "W A S D move, the arrow keys turn the camera, Space is A, and J K L are X Y B. " +
-                "Q and E are the bumpers, Shift and Ctrl are the triggers. Your mouse buttons work too.",
+                "W A S D move and the arrow keys turn the camera. Space is A, and J, K and L are X, Y and B. " +
+                "Q and E are the bumpers, and Shift and Ctrl are the triggers. Your mouse buttons work too.",
                 ScenePlay),
             new("Look around with the mouse (optional)",
-                "On the Mouse page, switch on \"Mouse moves a stick\" and the mouse turns the camera like in a PC game. " +
-                "Moving it faster tilts the stick further. Sensitivity and the stick it moves are on the same page.",
+                "On the Mouse page, turn on \"Mouse moves a stick\". The mouse then turns the camera like in a PC game. " +
+                "The faster you move the mouse, the further the stick tilts. You can change the sensitivity on the same page.",
                 SceneMouse),
             new("Change any key",
-                "Open Key bindings and click a row. Press the new key, or click with a mouse button, then choose Replace. " +
-                "Choose Add as extra key to keep the old key as well.",
+                "Open the Key bindings page and click a row. Press the new key, or click with a mouse button, then choose Replace. " +
+                "To keep the old key as well, choose Add as extra key.",
                 SceneRebind),
-            new("Pause and stop with hotkeys",
-                $"{Keys("PauseKey")} pauses the keyboard pad so you can type, and pressing it again resumes. {Keys("ExitKey")} turns it off. " +
-                "Both work while the game is in front. Closing Co-op Warrior also removes the virtual controller.",
+            new("Pause and turn off with hotkeys",
+                $"{Keys("PauseKey")} pauses the keyboard controller so you can type, and pressing it again resumes. {Keys("ExitKey")} turns it off. " +
+                "Both hotkeys work while the game is in front. Closing Co-op Warrior also turns the keyboard controller off.",
                 SceneHotkeys),
         ];
         Pips.NumberOfPages = steps.Length;
@@ -71,11 +72,11 @@ public sealed partial class TutorialPage : Page
         Unloaded += (_, _) => cts?.Cancel();
     }
 
-    static string Keys(string name) => string.Join(" or ", App.Config.Get(name).Select(KeyNames.Label));
+    static string Keys(string name) => string.Join(" or ", App.Profile.Get(name).Select(KeyNames.Label));
 
     static string Key(string name, string fallback)
     {
-        int[] k = App.Config.Get(name);
+        int[] k = App.Profile.Get(name);
         return k.Length > 0 ? KeyNames.Label(k[0]) : fallback;
     }
 
@@ -256,8 +257,9 @@ public sealed partial class TutorialPage : Page
         var bar = new Border { CornerRadius = new CornerRadius(6), Padding = new Thickness(12, 10, 12, 10), VerticalAlignment = VerticalAlignment.Top };
         var barRow = new Grid { ColumnSpacing = 10, ColumnDefinitions = { new ColumnDefinition { Width = GridLength.Auto }, new ColumnDefinition(), new ColumnDefinition { Width = GridLength.Auto } } };
         var icon = Glyph("", 16);
-        var message = Text("Driver not installed", 13, true);
+        var message = Text("The controller driver is not installed", 13, true);
         message.VerticalAlignment = VerticalAlignment.Center;
+        message.TextWrapping = TextWrapping.Wrap;
         var ring = new ProgressRing { Width = 18, Height = 18, IsActive = false };
         var install = FakeButton("Install driver", accent: true);
         Grid.SetColumn(message, 1);
@@ -294,7 +296,7 @@ public sealed partial class TutorialPage : Page
             bar.Background = Anim.Brush("SystemFillColorCautionBackgroundBrush");
             icon.Glyph = "";
             icon.Foreground = Anim.Brush("SystemFillColorCautionBrush");
-            message.Text = "Driver not installed";
+            message.Text = "The controller driver is not installed";
             install.Visibility = Visibility.Visible;
             ring.IsActive = false;
             uac.Opacity = 0;
@@ -307,7 +309,7 @@ public sealed partial class TutorialPage : Page
             await Click(ct);
             install.Visibility = Visibility.Collapsed;
             ring.IsActive = true;
-            message.Text = "Installing...";
+            message.Text = "Installing the controller driver...";
             bar.Background = Anim.Brush("SystemFillColorAttentionBackgroundBrush");
             icon.Glyph = "";
             icon.Foreground = Anim.Brush("AccentTextFillColorPrimaryBrush");
@@ -327,7 +329,7 @@ public sealed partial class TutorialPage : Page
             bar.Background = Anim.Brush("SystemFillColorSuccessBackgroundBrush");
             icon.Glyph = "";
             icon.Foreground = Anim.Brush("SystemFillColorSuccessBrush");
-            message.Text = "Driver installed";
+            message.Text = "The controller driver is installed";
             Anim.SetScale(icon, 0.4);
             _ = Anim.Scale(icon, 1, 300, Anim.Spring);
             await MoveCursor(560, 270, 900);
@@ -400,7 +402,7 @@ public sealed partial class TutorialPage : Page
         row.ColumnDefinitions.Add(new ColumnDefinition());
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         row.Children.Add(Glyph("", 18));
-        var label = Text("Virtual controller", 14);
+        var label = Text("Turn keyboard into a controller", 14);
         label.VerticalAlignment = VerticalAlignment.Center;
         Grid.SetColumn(label, 1);
         row.Children.Add(label);
@@ -466,7 +468,7 @@ public sealed partial class TutorialPage : Page
         }
     }
 
-    async Task SceneConfigs(CancellationToken ct)
+    async Task SceneProfiles(CancellationToken ct)
     {
         var title = Text("", 12, false, "TextFillColorSecondaryBrush");
         var titleRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
@@ -558,11 +560,11 @@ public sealed partial class TutorialPage : Page
         (double dx, double dy, int ms, short rx, short ry, string text)[] script =
         [
             (70, 0, 500, 16000, 0, "Slide right: the camera turns right"),
-            (0, 0, 700, 0, 0, "Stop: the stick goes back to the middle"),
+            (0, 0, 700, 0, 0, "Stop: the stick goes back to the center"),
             (-110, 0, 220, -32767, 0, "Move faster: the stick tilts all the way"),
-            (0, 0, 700, 0, 0, "Stop: the stick goes back to the middle"),
+            (0, 0, 700, 0, 0, "Stop: the stick goes back to the center"),
             (20, -50, 500, 0, 20000, "Up and down work too"),
-            (0, 0, 900, 0, 0, "Stop: the stick goes back to the middle"),
+            (0, 0, 900, 0, 0, "Stop: the stick goes back to the center"),
         ];
 
         while (true)

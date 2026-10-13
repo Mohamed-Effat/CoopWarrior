@@ -1,7 +1,7 @@
-# Writing a game config
+# Writing a game profile
 
-A config is a `.kpad` text file. The format is documented for players in `package/README.txt`;
-`src/Core/GameConfig.cs` is the reader and writer. Start from `src/DefaultConfigs/Default.kpad`.
+A profile is a `.kpad` text file. The format is documented for players in `package/README.txt`;
+`src/Core/GameProfile.cs` is the reader and writer. Start from `src/DefaultProfiles/Default.kpad`.
 
 ## Research a game
 
@@ -20,7 +20,7 @@ A config is a `.kpad` text file. The format is documented for players in `packag
 4. **Find out what the buttons do** from the game's controls screen, manual or store page.
    Write the action names in a `Note` only when confirmed; otherwise say they are assumed.
 
-## Write the config
+## Write the profile
 
 - `Name` as the game calls itself; the file name can be shorter.
 - `OnlyInGame = 1` when `GameProcess` is known.
@@ -31,8 +31,8 @@ A config is a `.kpad` text file. The format is documented for players in `packag
 
 ## Where it goes
 
-- Shipped with the app: `src/DefaultConfigs/<file>.kpad`, then rebuild. It is copied into the
-  player's `configs\` on the next start (once).
-- Only for this user: `C:\Programs\CoopWarrior\configs\<file>.kpad`. It shows up on the next start,
-  or the user can import it from the Game configs page.
-- Research notes: `docs/game-configs/<game>.md`.
+- Shipped with the app: `src/DefaultProfiles/<file>.kpad`, then rebuild. It is copied into the
+  player's `profiles\` on the next start (once).
+- Only for this user: `%AppData%\CoopWarrior\profiles\<file>.kpad` (installed copy). It shows up on the next start,
+  or the user can import it from the Profiles page.
+- Research notes: `docs/game-profiles/<game>.md`.
