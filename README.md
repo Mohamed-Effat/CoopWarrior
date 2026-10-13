@@ -12,8 +12,9 @@ so one more person can join a local co-op game.
 [![Windows 10 and 11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D4?logo=windows&logoColor=white)](#install)
 [![.NET 9](https://img.shields.io/badge/.NET-9-512BD4?logo=dotnet&logoColor=white)](#build-from-source)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-2EA44F)](LICENSE)
+[![Latest release](https://img.shields.io/github/v/release/Mohamed-Effat/CoopWarrior?label=Latest%20version&color=0078D4)](https://github.com/Mohamed-Effat/CoopWarrior/releases/latest)
 
-[**Download**](https://github.com/Mohamed-Effat/CoopWarrior/releases/latest) ·
+[**Download for Windows**](https://github.com/Mohamed-Effat/CoopWarrior/releases/latest/download/CoopWarrior-win-Setup.exe) ·
 [How to use](#how-to-use) ·
 [Default keys](#default-keys) ·
 [Problems](#if-something-goes-wrong)
@@ -50,6 +51,23 @@ keyboard and mouse.
 - **Live preview.** A drawing of the controller shows every button and stick as you press keys.
 - **Easy to install.** The installer needs no admin rights, and the app updates itself from GitHub.
 - **A built-in guide.** The first time you start the app, a short animated guide walks you through it.
+
+## Install
+
+You need 64-bit Windows 10 (version 1809 or newer) or Windows 11.
+
+1. Download [**CoopWarrior-win-Setup.exe**](https://github.com/Mohamed-Effat/CoopWarrior/releases/latest/download/CoopWarrior-win-Setup.exe).
+   The link always gives you the newest version.
+2. Run it. It installs for your Windows user only, so it needs no admin rights.
+   When it is done, Co-op Warrior opens by itself.
+
+The installer is not code-signed yet. Because of that, Windows may show "Windows protected your PC".
+Click **More info**, then **Run anyway**.
+
+Co-op Warrior needs the free [ViGEmBus](https://github.com/nefarius/ViGEmBus) driver, which adds the
+controller to Windows. The app includes the driver. If it is missing, the Dashboard shows a yellow
+message with an **Install driver** button. You install it once on each PC, and Windows asks for
+permission one time.
 
 ## See it in action
 
@@ -96,23 +114,6 @@ keyboard and mouse.
     <td align="center"><b>Profiles</b></td>
   </tr>
 </table>
-
-## Install
-
-You need 64-bit Windows 10 (version 1809 or newer) or Windows 11.
-
-1. Download `CoopWarrior-win-Setup.exe` from the
-   [latest release](https://github.com/Mohamed-Effat/CoopWarrior/releases/latest).
-2. Run it. It installs for your Windows user only, so it needs no admin rights.
-   When it is done, Co-op Warrior opens by itself.
-
-The installer is not code-signed yet. Because of that, Windows may show "Windows protected your PC".
-Click **More info**, then **Run anyway**.
-
-Co-op Warrior needs the free [ViGEmBus](https://github.com/nefarius/ViGEmBus) driver, which adds the
-controller to Windows. The app includes the driver. If it is missing, the Dashboard shows a yellow
-message with an **Install driver** button. You install it once on each PC, and Windows asks for
-permission one time.
 
 ## How to use
 
