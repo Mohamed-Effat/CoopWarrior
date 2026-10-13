@@ -8,6 +8,7 @@
 | [decisions/](decisions/) | One file per design decision: the context, the choice, what was rejected. |
 | [plans/](plans/) | Plans for features and larger changes, written before the work. Also the backlog. |
 | [game-profiles/](game-profiles/) | How to research a game and write its `.kpad` profile, and notes per game. |
+| [images/](images/) | The logo, animations and screenshots used in the main README. |
 
 ## Naming
 

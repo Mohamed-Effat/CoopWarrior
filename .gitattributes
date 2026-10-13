@@ -1,6 +1,6 @@
 * text=auto
 
-# Batch files misbehave with LF line endings; configs and the player README are edited in Notepad.
+# Batch files misbehave with LF line endings; profiles and the player README are edited in Notepad.
 *.bat  text eol=crlf
 *.kpad text eol=crlf
 *.txt  text eol=crlf
@@ -9,3 +9,4 @@
 *.msi binary
 *.ico binary
 *.png binary
+*.gif binary
