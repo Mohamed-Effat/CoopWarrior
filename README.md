@@ -27,12 +27,13 @@ so one more person can join a local co-op game.
 
 ## Why it exists
 
-Many PC games have local split-screen co-op, but the second player can only join with a controller.
-If you have one controller, the second person is stuck.
+Some local co-op games treat the keyboard and mouse and the first controller you connect as the same
+player: Player 1. Both control the same character. So with one controller and a keyboard,
+two people cannot play. The only way to get a Player 2 is to use a second controller.
 
-Co-op Warrior adds an Xbox 360 controller to Windows, and your keyboard and mouse drive it.
-The game sees two controllers, so two people can play: one with the real controller, one with the
-keyboard and mouse.
+Co-op Warrior fixes that. It makes your keyboard and mouse act as a **virtual controller**: Windows sees
+one more Xbox 360 controller, and your keyboard and mouse drive it. The game now has two controllers,
+so it gives each one its own player.
 
 ## Features
 

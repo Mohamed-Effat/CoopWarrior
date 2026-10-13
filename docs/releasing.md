@@ -47,5 +47,7 @@ Pushing commits does not update anyone; only a published release does.
 
 ## Notes
 
+- The README's download links point to `releases/latest/download/CoopWarrior-win-Setup.exe`, so they only
+  work while every release has an asset with exactly that name. Velopack names it from `--packId`.
 - `Build.bat` still builds a portable folder (no installer, no automatic updates) for local testing.
 - Velopack's unauthenticated GitHub checks are limited to 60 requests an hour per IP, far above one check a day.
