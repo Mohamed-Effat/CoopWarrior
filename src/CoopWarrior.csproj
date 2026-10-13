@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>CoopWarrior</RootNamespace>
+    <AssemblyName>CoopWarrior</AssemblyName>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWinUI>true</UseWinUI>
+    <Platforms>x64</Platforms>
+    <Platform>x64</Platform>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <WindowsPackageType>None</WindowsPackageType>
+    <!-- Without it, publishing an unpackaged app leaves out CoopWarrior.pri and the compiled .xbf pages. -->
+    <EnableMsixTooling>true</EnableMsixTooling>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\CoopWarrior.ico</ApplicationIcon>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <Version>2.0.0</Version>
+    <Product>Co-op Warrior</Product>
+    <AssemblyTitle>Co-op Warrior</AssemblyTitle>
+    <Authors>Mohamed Effat</Authors>
+    <Company>Mohamed Effat</Company>
+    <Copyright>Copyright (c) 2026 Mohamed Effat</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260921001" />
+    <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.251219" />
+  </ItemGroup>
+
+  <!-- The Windows App SDK self-contained targets copy ONNX Runtime and DirectML (about 40 MB)
+       from its ML package; they load only when the Windows ML APIs are used. -->
+  <Target Name="RemoveUnusedMachineLearningFiles" AfterTargets="Publish">
+    <Delete Files="$(PublishDir)onnxruntime.dll;$(PublishDir)onnxruntime_providers_shared.dll;$(PublishDir)DirectML.dll" />
+  </Target>
+
+  <ItemGroup>
+    <Content Include="lib\ViGEmClient.dll" Link="ViGEmClient.dll" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Assets\CoopWarrior.ico" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Assets\CoopWarrior.png" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="DefaultConfigs\*.kpad" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

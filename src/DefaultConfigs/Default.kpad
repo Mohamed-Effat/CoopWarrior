@@ -1,0 +1,46 @@
+# Co-op Warrior game config. Edit it in the app, or by hand in any text editor.
+# Lines starting with # are ignored. Format:  Setting = value
+# Key names: A-Z, D0-D9, Space, Return, Tab, Back, Up, Down, Left, Right, ShiftKey, ControlKey,
+#   Menu (Alt), F1-F12, LButton, RButton, MButton, XButton1, XButton2. Separate several keys with commas.
+
+Name = Default
+GameProcess =
+OnlyInGame = 0
+
+# Controller buttons
+MoveUp = W
+MoveDown = S
+MoveLeft = A
+MoveRight = D
+CamUp = Up
+CamDown = Down
+CamLeft = Left
+CamRight = Right
+A = Space
+B = L, MButton
+X = J, LButton
+Y = K, RButton
+LB = Q
+RB = E
+LT = ShiftKey
+RT = ControlKey
+DpadUp = T
+DpadDown = G
+DpadLeft = F
+DpadRight = H
+L3 = Z
+R3 = X
+Start = Return
+Back = Tab
+
+# Hotkeys (work while the game is in front)
+PauseKey = F9
+ExitKey = F12
+
+# Mouse. MouseStick: Off, Left or Right. Sensitivity 1-10. Deadzone 0-40 (percent).
+MouseStick = Off
+MouseSensitivity = 5
+MouseDeadzone = 25
+MouseInvertY = 0
+MouseButtons = 1
+LockCursor = 1

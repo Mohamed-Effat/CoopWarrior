@@ -1,0 +1,50 @@
+# Co-op Warrior game config. Edit it in the app, or by hand in any text editor.
+# Lines starting with # are ignored. Format:  Setting = value
+# Key names: A-Z, D0-D9, Space, Return, Tab, Back, Up, Down, Left, Right, ShiftKey, ControlKey,
+#   Menu (Alt), F1-F12, LButton, RButton, MButton, XButton1, XButton2. Separate several keys with commas.
+
+Name = DYNASTY WARRIORS 3: Complete Edition Remastered
+# The launcher DW3CE_RE.exe starts this program, which owns the game window.
+GameProcess = DW3CE_RE-Win64-Shipping
+OnlyInGame = 1
+Note = The face buttons follow the classic Dynasty Warriors pad layout: left click or J is X (normal attack), right click or K is Y (charge attack), middle click or L is B (Musou), Space is A (jump). Check the game's own controls screen if an action is somewhere else.
+Note = The mouse turns the camera (right stick) and the cursor is held in the corner of the game window. If the camera does not move in a mode, switch "Mouse moves a stick" off on the Mouse page.
+Note = The game ships a Steam Input layout. If both controllers move Player 1, turn off Steam Input for this game: Steam > right-click the game > Properties > Controller > Disable Steam Input.
+
+# Controller buttons
+MoveUp = W
+MoveDown = S
+MoveLeft = A
+MoveRight = D
+CamUp = Up
+CamDown = Down
+CamLeft = Left
+CamRight = Right
+A = Space
+B = L, MButton
+X = J, LButton
+Y = K, RButton
+LB = Q
+RB = E
+LT = ShiftKey
+RT = ControlKey
+DpadUp = T
+DpadDown = G
+DpadLeft = F
+DpadRight = H
+L3 = Z
+R3 = X
+Start = Return
+Back = Tab
+
+# Hotkeys (work while the game is in front)
+PauseKey = F9
+ExitKey = F12
+
+# Mouse. MouseStick: Off, Left or Right. Sensitivity 1-10. Deadzone 0-40 (percent).
+MouseStick = Right
+MouseSensitivity = 5
+MouseDeadzone = 25
+MouseInvertY = 0
+MouseButtons = 1
+LockCursor = 1
