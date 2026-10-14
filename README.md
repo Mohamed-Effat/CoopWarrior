@@ -51,6 +51,8 @@ so it gives each one its own player.
   window, your keys work as normal keys again.
 - **Live preview.** The Dashboard draws your keyboard and its controller: the keys you press light up
   and the controller moves with them. It also shows the other controllers Windows sees, each with its player number.
+- **Out of the way.** Minimizing or closing the window keeps Co-op Warrior running next to the clock,
+  where a right-click turns the keyboard controller on or off.
 - **Easy to install.** The installer needs no admin rights, and the app updates itself from GitHub.
 - **A built-in guide.** The first time you start the app, a short animated guide walks you through it.
 
@@ -127,7 +129,9 @@ permission one time.
 5. **Start the game** and choose a two-player or split-screen mode. Each player presses Start on their
    own controller to join. On the keyboard, Start is Enter.
 
-When you are done, press **F12** or close Co-op Warrior. The keyboard controller disappears from Windows.
+When you are done, press **F12**, or right-click the Co-op Warrior icon next to the clock and choose **Exit**.
+The keyboard controller disappears from Windows. Closing or minimizing the window only hides it next to the clock,
+and the keyboard controller keeps working; you can change that on the Settings page.
 To type normally in between, press **F9** to pause, and press it again to resume.
 
 ## Default keys

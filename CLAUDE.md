@@ -24,6 +24,7 @@ Started as "Keyboard Pad", then briefly "Keyboard Warrior"; `v1-winforms\` is th
   `GameProfile` (.kpad format), `ProfileStore` (data folder, active profile, CoopWarrior.ini),
   `Updater` (Velopack checks and updates), `Gamepads` (reads the XInput slots), `KeyNames`, `Driver`.
 - `src\Program.cs` - entry point: Velopack hooks first, then WinUI.
+- `src\TrayIcon.cs` - the notification area icon and its menu (Shell_NotifyIcon, subclasses the main window).
 - `src\Pages\` - one page per navigation item, plus `RebindDialog`.
 - `src\Controls\` - `ControllerView` (drawn pad), `KeyboardView` (drawn keyboard), `Keycap`, `Anim` (awaitable storyboards).
 - `src\DefaultProfiles\*.kpad` - profiles shipped with the app, installed into `profiles\` once.
@@ -56,6 +57,9 @@ Started as "Keyboard Pad", then briefly "Keyboard Warrior"; `v1-winforms\` is th
   portable -> folder with `Start.bat`, source build -> exe folder. Never store user data in the program folder
   of an installed copy; updates replace it.
 - **Versions**: `vpk` and the `Velopack` package must stay on the same version.
+- **Closing does not quit** by default: the close button and minimize hide the window to the notification area
+  (Settings page). To end the app in a test, use the tray menu's Exit or kill the process; `CloseMainWindow`
+  only hides it, and the next build then fails on the locked exe.
 
 ## Testing
 

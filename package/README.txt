@@ -32,6 +32,11 @@ HOW TO USE
 7. When you are done, press F12 or turn the switch off. The keyboard
    controller disappears from Windows.
 
+Closing or minimizing the window does not quit Co-op Warrior: it keeps
+running next to the clock, and the keyboard controller keeps working. To
+quit, right-click the Co-op Warrior icon next to the clock and choose Exit.
+You can change this on the Settings page.
+
 F9 pauses and resumes, so you can type normally in between. While the
 keyboard controller is on, the keys it uses do not also press buttons in
 the Co-op Warrior window.

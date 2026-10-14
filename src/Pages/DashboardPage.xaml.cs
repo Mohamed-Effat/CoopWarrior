@@ -196,8 +196,7 @@ public sealed partial class DashboardPage : Page
 
     void TurnOn()
     {
-        App.Engine.Apply(App.Profile);
-        string? err = App.Engine.Start(App.Store.Player);
+        string? err = App.TurnOn();
         if (err == null) return;
         ErrorBar.Message = err;
         ErrorBar.IsOpen = true;

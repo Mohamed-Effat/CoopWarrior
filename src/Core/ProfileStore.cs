@@ -41,6 +41,13 @@ public sealed class ProfileStore
     /// <summary>The player number (1-4) the keyboard controller asks for, or 0 for the next free one.</summary>
     public int Player { get; set; }
 
+    public bool MinimizeToTray { get; set; } = true;
+
+    public bool CloseToTray { get; set; } = true;
+
+    /// <summary>Whether the notification saying the app keeps running in the notification area was shown.</summary>
+    public bool TrayHintShown { get; set; }
+
     public event Action? ActiveChanged;
 
     public event Action? ListChanged;
@@ -99,6 +106,9 @@ public sealed class ProfileStore
                 if (name is "ActiveProfile" or "ActiveConfig") activeFile = val;
                 else if (name == "TutorialSeen") TutorialSeen = val == "1";
                 else if (name == "CheckForUpdates") CheckForUpdates = val != "0";
+                else if (name == "MinimizeToTray") MinimizeToTray = val != "0";
+                else if (name == "CloseToTray") CloseToTray = val != "0";
+                else if (name == "TrayHintShown") TrayHintShown = val == "1";
                 else if (name == "Player" && int.TryParse(val, out int player)) Player = Math.Clamp(player, 0, 4);
                 else if (name == "LastUpdateCheck" &&
                          DateTime.TryParse(val, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out DateTime t))
@@ -120,6 +130,9 @@ public sealed class ProfileStore
             "Player = " + Player.ToString(CultureInfo.InvariantCulture) + "\r\n" +
             "TutorialSeen = " + (TutorialSeen ? "1" : "0") + "\r\n" +
             "CheckForUpdates = " + (CheckForUpdates ? "1" : "0") + "\r\n" +
+            "MinimizeToTray = " + (MinimizeToTray ? "1" : "0") + "\r\n" +
+            "CloseToTray = " + (CloseToTray ? "1" : "0") + "\r\n" +
+            "TrayHintShown = " + (TrayHintShown ? "1" : "0") + "\r\n" +
             "LastUpdateCheck = " + LastUpdateCheck.ToUniversalTime().ToString("o", CultureInfo.InvariantCulture) + "\r\n" +
             "InstalledDefaults = " + string.Join(" | ", seenDefaults) + "\r\n";
         try { File.WriteAllText(SettingsPath, text); }

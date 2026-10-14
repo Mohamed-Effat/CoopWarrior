@@ -21,7 +21,9 @@ public sealed partial class MainWindow : Window
     private static partial uint GetDpiForWindow(IntPtr hWnd);
 
     readonly DispatcherQueueTimer timer;
+    readonly TrayIcon tray;
     string lastStatus = "";
+    bool exiting;
 
     /// <summary>Raised about 30 times a second so pages can show live state.</summary>
     public event Action? Tick;
@@ -45,8 +47,28 @@ public sealed partial class MainWindow : Window
         timer.Tick += (_, _) => OnTick();
         timer.Start();
 
+        tray = new TrayIcon(WinRT.Interop.WindowNative.GetWindowHandle(this),
+            Path.Combine(AppContext.BaseDirectory, "Assets", "CoopWarrior.ico"), WindowTitle);
+        tray.Clicked += ShowFromTray;
+        tray.Minimized += () => DispatcherQueue.TryEnqueue(() => { if (App.Store.MinimizeToTray) AppWindow.Hide(); });
+        tray.Menu = TrayMenu;
+        UpdateTray();
+
+        AppWindow.Closing += (_, e) =>
+        {
+            if (exiting || !App.Store.CloseToTray) return;
+            e.Cancel = true;
+            AppWindow.Hide();
+            if (App.Store.TrayHintShown) return;
+            tray.Notify("Co-op Warrior is still running",
+                "The keyboard controller keeps working. Click the Co-op Warrior icon next to the clock to open it, or right-click it to exit.");
+            App.Store.TrayHintShown = true;
+            App.Store.SaveSettings();
+        };
+
         Closed += (_, _) =>
         {
+            tray.Dispose();
             timer.Stop();
             App.Engine.Stop();
             App.Profile.Save();
@@ -77,6 +99,41 @@ public sealed partial class MainWindow : Window
     }
 
     public void ShowProfileName() => ProfileText.Text = App.Profile.Name;
+
+    /// <summary>Shows the notification area icon while either tray setting is on.</summary>
+    public void UpdateTray() => tray.Visible = App.Store.MinimizeToTray || App.Store.CloseToTray;
+
+    void ShowFromTray()
+    {
+        AppWindow.Show();
+        if (AppWindow.Presenter is OverlappedPresenter { State: OverlappedPresenterState.Minimized } p) p.Restore();
+        Activate();
+    }
+
+    IReadOnlyList<TrayIcon.MenuItem?> TrayMenu() =>
+    [
+        new("Open Co-op Warrior", false, ShowFromTray),
+        new("Turn keyboard into a controller", App.Engine.Running, ToggleFromTray),
+        null,
+        new("Exit", false, Exit),
+    ];
+
+    void ToggleFromTray()
+    {
+        if (App.Engine.Running)
+        {
+            App.Engine.Stop();
+            return;
+        }
+        if (App.TurnOn() is string err) tray.Notify("Could not turn on", err);
+    }
+
+    /// <summary>Quits the app, even when the close button only hides the window.</summary>
+    public void Exit()
+    {
+        exiting = true;
+        Close();
+    }
 
     /// <summary>Checks GitHub at most once every 20 hours, and only when the user has not turned checks off.</summary>
     static async Task CheckForUpdatesOnStartAsync()
@@ -186,6 +243,7 @@ public sealed partial class MainWindow : Window
             "Mouse" => typeof(MousePage),
             "Profiles" => typeof(ProfilesPage),
             "About" => typeof(AboutPage),
+            "Settings" => typeof(SettingsPage),
             "Tutorial" => typeof(TutorialPage),
             _ => typeof(DashboardPage),
         };
@@ -203,6 +261,7 @@ public sealed partial class MainWindow : Window
         {
             lastStatus = status;
             StatusText.Text = status;
+            tray.SetTip($"{WindowTitle}: {status}");
             StatusDot.Fill = (Brush)Application.Current.Resources[status switch
             {
                 "On" => "SystemFillColorSuccessBrush",

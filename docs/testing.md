@@ -12,7 +12,8 @@ pad back through XInput. Scripts are in `tools/test/` (Windows PowerShell 5.1).
   without moving the pointer, and `[T]::Print` captures a window with `PrintWindow` even when it is covered.
 - `[T]::Front` taps Alt to be allowed to bring a window forward. That Alt tap reaches the focused window
   and can swallow the next mouse click, so avoid it while a dialog in the app is listening for a key.
-- Close the app before rebuilding; Build.bat refuses while it runs.
+- Close the app before rebuilding; Build.bat refuses while it runs. The close button only hides the window
+  to the notification area by default, so exit from the tray menu or stop the process.
 
 ## Scripts
 
@@ -44,7 +45,10 @@ Engine and pad
 - [ ] Every default key moves the right axis or button; diagonals read 23169 on both axes; opposite keys cancel.
 - [ ] Left and right Shift both give LT 255; left and right Ctrl give RT 255.
 - [ ] F9 pauses (pad neutral, amber status) and resumes; F12 removes the pad and flips the switch off.
-- [ ] Closing the window and killing the process both remove the pad.
+- [ ] Exit from the tray menu, closing the window with "Close to the notification area" off, and killing the
+      process all remove the pad.
+- [ ] Minimize and close hide the window to the tray (each per its setting); a tray click brings it back;
+      starting the app again shows the hidden window; the tray menu's switch turns the pad on and off.
 - [ ] Player number 1 to 4 puts the pad in XInput slot 0 to 3; "Next free player" takes the lowest free slot.
       Changing it while on reconnects the pad in the new slot. With another pad holding the chosen slot,
       the pad takes the next free one and the Dashboard shows a warning.

@@ -63,7 +63,8 @@ public sealed partial class TutorialPage : Page
                 SceneRebind),
             new("Pause and turn off with hotkeys",
                 $"{Keys("PauseKey")} pauses the keyboard controller so you can type, and pressing it again resumes. {Keys("ExitKey")} turns it off. " +
-                "Both hotkeys work while the game is in front. Closing Co-op Warrior also turns the keyboard controller off.",
+                "Both hotkeys work while the game is in front. Exiting Co-op Warrior also turns it off. The close button only hides " +
+                "the window: to exit, right-click the Co-op Warrior icon next to the clock and choose Exit.",
                 SceneHotkeys),
         ];
         Pips.NumberOfPages = steps.Length;

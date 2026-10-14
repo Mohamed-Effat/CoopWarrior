@@ -17,6 +17,14 @@ public partial class App : Application
     /// <summary>The active game profile.</summary>
     public static GameProfile Profile => Store.Active;
 
+    /// <summary>Turns the keyboard controller on with the active profile and player number.</summary>
+    /// <returns>Null on success, otherwise a message for the user.</returns>
+    public static string? TurnOn()
+    {
+        Engine.Apply(Profile);
+        return Engine.Start(Store.Player);
+    }
+
     /// <summary>Saves the active profile and passes its settings to the engine.</summary>
     public static void ProfileChanged()
     {
@@ -65,10 +73,16 @@ static partial class Native
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool IsIconic(IntPtr hWnd);
 
+    [LibraryImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool IsWindowVisible(IntPtr hWnd);
+
     public static void ActivateExistingWindow(string title)
     {
         IntPtr h = FindWindow(null, title);
         if (h == IntPtr.Zero) return;
+        // The window is hidden while the app sits in the notification area.
+        if (!IsWindowVisible(h)) ShowWindow(h, 5);
         if (IsIconic(h)) ShowWindow(h, 9);
         SetForegroundWindow(h);
     }

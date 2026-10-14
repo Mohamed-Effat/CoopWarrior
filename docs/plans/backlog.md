@@ -13,6 +13,9 @@ Open items. Move one into its own plan file when work starts.
   the full round trip through the dialog was not automated (the test filled the dialog's search box).
 - **Real 150% display scaling.** WinUI scales by itself; only 125% was seen on screen.
 - **Installing the driver from the app.** The driver was already installed on the dev PC.
+- **The notification area icon, by hand.** Tested through window messages only: a real click on the icon,
+  the notification on the first close, and the icon coming back after Explorer restarts are not checked.
+  In one early test a simulated click did not bring the window back; it did not happen again.
 - **The live Dashboard in the light theme.**
 
 ## Make the README animations real
