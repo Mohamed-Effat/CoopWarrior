@@ -21,7 +21,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\CoopWarrior.ico</ApplicationIcon>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-    <Version>2.1.0</Version>
+    <Version>2.2.0</Version>
     <Product>Co-op Warrior</Product>
     <AssemblyTitle>Co-op Warrior</AssemblyTitle>
     <Authors>Mohamed Effat</Authors>
