@@ -9,11 +9,11 @@ Started as "Keyboard Pad", then briefly "Keyboard Warrior"; `v1-winforms\` is th
 - Players install `CoopWarrior-win-Setup.exe` (Velopack). It installs per-user to
   `%LocalAppData%\CoopWarrior` and updates itself from GitHub Releases of
   `github.com/Mohamed-Effat/CoopWarrior`. Their data is in `%AppData%\CoopWarrior`.
-- Releases are built and published on GitHub by the Release workflow (`gh workflow run release.yml -f version=X.Y.Z`),
-  which runs `tools\release\Release.ps1` there; notes go in `docs\release-notes\X.Y.Z.md`. Publishing reaches every
-  player - only when the user asks. Locally, `Release.ps1 -Version X.Y.Z` builds into `releases\` for testing.
-  Do not run `-Publish` from the dev PC: it moves about 300 MB over the user's connection.
-  Full steps, including testing an update locally first, in docs/releasing.md.
+- **Releases always go through the Release workflow on GitHub** (`gh workflow run release.yml -f version=X.Y.Z`),
+  never from the dev PC: publishing locally moves about 300 MB over the user's connection, and `Release.ps1 -Publish`
+  refuses outside GitHub Actions. Follow docs/releasing.md step by step (notes in `docs\release-notes\X.Y.Z.md`,
+  csproj version, push, run, check). Publishing reaches every player - only when the user asks.
+  Locally, `Release.ps1 -Version X.Y.Z` builds into `releases\` for testing an update.
 - Quick compile check: `dotnet build src -c Release`. A build run from `src\bin` keeps its data next to the exe.
 - `Build.bat` builds a portable folder (`dist\CoopWarrior`, or a folder given as argument) for local tests;
   portable copies keep data next to `Start.bat` and do not update themselves.

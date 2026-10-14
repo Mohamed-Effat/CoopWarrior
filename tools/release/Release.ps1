@@ -8,8 +8,8 @@ Builds into releases\ only. Install releases\CoopWarrior-win-Setup.exe to try it
 
 .EXAMPLE
 .\tools\release\Release.ps1 -Version 2.0.1 -Publish
-Also uploads the release to GitHub, where installed copies find it. Uses $env:GITHUB_TOKEN when it is set
-(the Release workflow sets it), otherwise the gh CLI login. Add -Draft to leave the release unpublished.
+Also uploads the release to GitHub, where installed copies find it. Runs only in the Release workflow on
+GitHub Actions, which sets GITHUB_TOKEN (see docs/releasing.md). Add -Draft to leave the release unpublished.
 Release notes come from docs\release-notes\<version>.md when that file exists, or from -Notes.
 #>
 param(
@@ -26,6 +26,9 @@ $publishDir = Join-Path $repo 'artifacts\publish'
 $releaseDir = Join-Path $repo 'releases'
 
 if ($Version -notmatch '^\d+\.\d+\.\d+$') { throw "Version must look like 2.0.1, not '$Version'." }
+if ($Publish -and $env:GITHUB_ACTIONS -ne 'true') {
+    throw 'Releases are published by the Release workflow on GitHub, not from this PC. See docs/releasing.md: gh workflow run release.yml -f version=' + $Version
+}
 if (-not $Notes) {
     $defaultNotes = Join-Path $repo "docs\release-notes\$Version.md"
     if (Test-Path $defaultNotes) { $Notes = $defaultNotes }
@@ -42,8 +45,7 @@ if ($LASTEXITCODE) { throw 'dotnet publish failed.' }
 $token = $null
 if ($Publish) {
     $token = $env:GITHUB_TOKEN
-    if (-not $token) { $token = (gh auth token).Trim() }
-    if (-not $token) { throw 'Not logged in to GitHub. Run: gh auth login' }
+    if (-not $token) { throw 'GITHUB_TOKEN is not set. The Release workflow passes it to this script.' }
     # The previous release lets vpk build a delta package, so players download only what changed.
     Write-Host 'Downloading the latest published release for delta packages...'
     vpk download github --repoUrl $repoUrl --token $token --outputDir $releaseDir
