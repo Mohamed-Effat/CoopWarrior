@@ -7,12 +7,15 @@ Builds a Co-op Warrior release with Velopack: CoopWarrior-win-Setup.exe plus upd
 Builds into releases\ only. Install releases\CoopWarrior-win-Setup.exe to try it.
 
 .EXAMPLE
-.\tools\release\Release.ps1 -Version 2.0.1 -Publish -Notes notes.md
-Also uploads the release to GitHub, where installed copies find it. Uses the gh CLI login.
+.\tools\release\Release.ps1 -Version 2.0.1 -Publish
+Also uploads the release to GitHub, where installed copies find it. Uses $env:GITHUB_TOKEN when it is set
+(the Release workflow sets it), otherwise the gh CLI login. Add -Draft to leave the release unpublished.
+Release notes come from docs\release-notes\<version>.md when that file exists, or from -Notes.
 #>
 param(
     [Parameter(Mandatory)][string]$Version,
     [switch]$Publish,
+    [switch]$Draft,
     [string]$Notes
 )
 $ErrorActionPreference = 'Stop'
@@ -23,6 +26,10 @@ $publishDir = Join-Path $repo 'artifacts\publish'
 $releaseDir = Join-Path $repo 'releases'
 
 if ($Version -notmatch '^\d+\.\d+\.\d+$') { throw "Version must look like 2.0.1, not '$Version'." }
+if (-not $Notes) {
+    $defaultNotes = Join-Path $repo "docs\release-notes\$Version.md"
+    if (Test-Path $defaultNotes) { $Notes = $defaultNotes }
+}
 if (-not (Get-Command vpk -ErrorAction SilentlyContinue)) {
     throw 'vpk is not installed. Run: dotnet tool install -g vpk --version 1.2.161'
 }
@@ -34,7 +41,8 @@ if ($LASTEXITCODE) { throw 'dotnet publish failed.' }
 
 $token = $null
 if ($Publish) {
-    $token = (gh auth token).Trim()
+    $token = $env:GITHUB_TOKEN
+    if (-not $token) { $token = (gh auth token).Trim() }
     if (-not $token) { throw 'Not logged in to GitHub. Run: gh auth login' }
     # The previous release lets vpk build a delta package, so players download only what changed.
     Write-Host 'Downloading the latest published release for delta packages...'
@@ -61,10 +69,20 @@ if ($LASTEXITCODE) { throw 'vpk pack failed.' }
 
 if ($Publish) {
     Write-Host 'Uploading to GitHub...'
-    vpk upload github --repoUrl $repoUrl --token $token --outputDir $releaseDir --publish `
-        --releaseName "Co-op Warrior $Version" --tag "v$Version"
+    $upload = @(
+        'upload', 'github',
+        '--repoUrl', $repoUrl,
+        '--token', $token,
+        '--outputDir', $releaseDir,
+        '--releaseName', "Co-op Warrior $Version",
+        '--tag', "v$Version",
+        '--targetCommitish', (git -C $repo rev-parse HEAD)
+    )
+    if (-not $Draft) { $upload += '--publish' }
+    vpk @upload
     if ($LASTEXITCODE) { throw 'vpk upload failed.' }
-    Write-Host "Published: $repoUrl/releases/tag/v$Version"
+    if ($Draft) { Write-Host "Draft created; publish it at $repoUrl/releases" }
+    else { Write-Host "Published: $repoUrl/releases/tag/v$Version" }
 }
 else {
     Write-Host "Built locally in $releaseDir. Nothing was uploaded."

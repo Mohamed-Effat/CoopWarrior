@@ -9,8 +9,10 @@ Started as "Keyboard Pad", then briefly "Keyboard Warrior"; `v1-winforms\` is th
 - Players install `CoopWarrior-win-Setup.exe` (Velopack). It installs per-user to
   `%LocalAppData%\CoopWarrior` and updates itself from GitHub Releases of
   `github.com/Mohamed-Effat/CoopWarrior`. Their data is in `%AppData%\CoopWarrior`.
-- `tools\release\Release.ps1 -Version X.Y.Z` builds the installer and update packages into `releases\`;
-  add `-Publish` to upload a GitHub Release. Publishing reaches every player - only when the user asks.
+- Releases are built and published on GitHub by the Release workflow (`gh workflow run release.yml -f version=X.Y.Z`),
+  which runs `tools\release\Release.ps1` there; notes go in `docs\release-notes\X.Y.Z.md`. Publishing reaches every
+  player - only when the user asks. Locally, `Release.ps1 -Version X.Y.Z` builds into `releases\` for testing.
+  Do not run `-Publish` from the dev PC: it moves about 300 MB over the user's connection.
   Full steps, including testing an update locally first, in docs/releasing.md.
 - Quick compile check: `dotnet build src -c Release`. A build run from `src\bin` keeps its data next to the exe.
 - `Build.bat` builds a portable folder (`dist\CoopWarrior`, or a folder given as argument) for local tests;
@@ -56,7 +58,8 @@ Started as "Keyboard Pad", then briefly "Keyboard Warrior"; `v1-winforms\` is th
 - **Data location** depends on how the app runs (`ProfileStore.RootFolder`): installed -> `%AppData%\CoopWarrior`,
   portable -> folder with `Start.bat`, source build -> exe folder. Never store user data in the program folder
   of an installed copy; updates replace it.
-- **Versions**: `vpk` and the `Velopack` package must stay on the same version.
+- **Versions**: `vpk` and the `Velopack` package must stay on the same version, including the vpk that
+  `.github/workflows/release.yml` installs.
 - **Closing does not quit** by default: the close button and minimize hide the window to the notification area
   (Settings page). To end the app in a test, use the tray menu's Exit or kill the process; `CloseMainWindow`
   only hides it, and the next build then fails on the locked exe.

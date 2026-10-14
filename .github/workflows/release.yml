@@ -1,0 +1,51 @@
+# Builds Co-op Warrior on GitHub's Windows runner and uploads the release to GitHub Releases.
+# Start it from the Actions tab (Release > Run workflow) or: gh workflow run release.yml -f version=2.2.0
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release, for example 2.2.0. Notes come from docs/release-notes/<version>.md."
+        required: true
+      draft:
+        description: "Leave the release as a draft, to publish by hand on the Releases page"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      # Keep on the same version as the Velopack package in src/CoopWarrior.csproj.
+      - name: Install vpk
+        shell: pwsh
+        run: |
+          dotnet tool install -g vpk --version 1.2.161
+          "$env:USERPROFILE\.dotnet\tools" | Out-File -Append -Encoding utf8 $env:GITHUB_PATH
+
+      - name: Build and upload
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ inputs.version }}
+          DRAFT: ${{ inputs.draft }}
+        run: |
+          if ($env:DRAFT -eq 'true') {
+            ./tools/release/Release.ps1 -Version $env:VERSION -Publish -Draft
+          } else {
+            ./tools/release/Release.ps1 -Version $env:VERSION -Publish
+          }
