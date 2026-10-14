@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+<!-- Co-op Warrior logo: one controller in two halves, a keyboard half (W A S D) and a button half. -->
+<clipPath id="left-half">
+<rect x="0" y="0" width="124.0" height="256"/>
+</clipPath>
+<clipPath id="right-half">
+<rect x="132.0" y="0" width="124.0" height="256"/>
+</clipPath>
+<g transform="translate(0 -37)">
+<path fill="#3F6FB0" d="M72 104 H184 C214 104 232 126 238 160 C244 196 236 222 214 224 C198 226 186 214 176 198 L168 186 H88 L80 198 C70 214 58 226 42 224 C20 222 12 196 18 160 C24 126 42 104 72 104 Z" clip-path="url(#left-half)"/>
+<path fill="#C8442B" d="M72 104 H184 C214 104 232 126 238 160 C244 196 236 222 214 224 C198 226 186 214 176 198 L168 186 H88 L80 198 C70 214 58 226 42 224 C20 222 12 196 18 160 C24 126 42 104 72 104 Z" clip-path="url(#right-half)"/>
+<rect x="68" y="124" width="17" height="17" rx="3.5" fill="#F2E8D4"/>
+<rect x="47" y="145" width="17" height="17" rx="3.5" fill="#F2E8D4"/>
+<rect x="68" y="145" width="17" height="17" rx="3.5" fill="#F2E8D4"/>
+<rect x="89" y="145" width="17" height="17" rx="3.5" fill="#F2E8D4"/>
+<circle cx="182" cy="128" r="9" fill="#F2E8D4"/>
+<circle cx="200" cy="146" r="9" fill="#F2E8D4"/>
+<circle cx="164" cy="146" r="9" fill="#F2E8D4"/>
+<circle cx="182" cy="164" r="9" fill="#F2E8D4"/>
+</g>
+</svg>

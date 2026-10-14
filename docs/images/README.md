@@ -120,5 +120,9 @@ marked "In use").
 
 ## Other
 
-- `logo.png` - the app icon, 256 x 256: a white gamepad outline (a plus-shaped D-pad on the left, two
-  round buttons on the right) on a blue rounded square.
+- `logo.svg` - the logo's source: a controller split down the middle on a transparent background. The left
+  half is steel blue (#3F6FB0) with four small bone-colored (#F2E8D4) keycaps in an upside-down T, W A S D;
+  the right half is red (#C8442B) with four bone buttons in a diamond. A thin gap separates the halves:
+  a keyboard player and a controller player sharing one game.
+- `logo.png` - `logo.svg` rendered at 256 x 256. `src/Assets/CoopWarrior.png` is the same image, and
+  `src/Assets/CoopWarrior.ico` holds it at 16 to 256 px.
