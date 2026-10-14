@@ -27,7 +27,8 @@ public sealed class Keycap : UserControl
         };
         border = new Border
         {
-            Child = text,
+            // A label wider than a fixed-width key shrinks to fit.
+            Child = new Viewbox { Child = text, StretchDirection = StretchDirection.DownOnly },
             MinWidth = minWidth,
             MinHeight = minWidth - 2,
             Padding = new Thickness(10, 6, 10, 6),

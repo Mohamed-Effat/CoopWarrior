@@ -24,8 +24,10 @@ HOW TO USE
 4. Under "Game profile", pick the profile for your game
    (for example "DYNASTY WARRIORS 3: Complete Edition Remastered").
 5. Turn on "Turn keyboard into a controller" at the top of the Dashboard.
-   The dot at the top of the window turns green. The controller picture
-   moves when you press keys, so you can see that it works.
+   The dot at the top of the window turns green. The keys you press light
+   up and the controller picture moves, so you can see that it works.
+   Under it, the Dashboard shows the other controllers Windows sees, each
+   with its player number.
 6. Start the game and choose two players.
 7. When you are done, press F12 or turn the switch off. The keyboard
    controller disappears from Windows.

@@ -8,10 +8,15 @@ namespace CoopWarrior.Pages;
 
 public sealed partial class DashboardPage : Page
 {
+    readonly Gamepads gamepads = new();
+    readonly long[] seenSince = new long[Gamepads.Slots];
     bool syncing;
     bool installing;
+    bool wasRunning;
+    bool badgeShown;
     int lastDriverCheck;
     string lastState = "";
+    string lastCaption = "";
 
     public DashboardPage()
     {
@@ -28,6 +33,8 @@ public sealed partial class DashboardPage : Page
         PadToggle.IsOn = App.Engine.Running;
         PlayerBox.SelectedIndex = App.Store.Player;
         syncing = false;
+
+        Keyboard.ShowKeys(App.Profile);
 
         foreach (int vk in App.Profile.Get("PauseKey")) PauseKeys.Children.Add(new Keycap(KeyNames.Label(vk)));
         foreach (int vk in App.Profile.Get("ExitKey")) StopKeys.Children.Add(new Keycap(KeyNames.Label(vk)));
@@ -59,8 +66,15 @@ public sealed partial class DashboardPage : Page
             syncing = false;
         }
 
-        Pad.Show(engine.Running ? engine.Current : default);
-        Pad.Opacity = engine.Running && !engine.Paused ? 1.0 : 0.5;
+        bool running = engine.Running;
+        Pad.Show(running ? engine.Current : default);
+        Pad.Opacity = Keyboard.Opacity = running && !engine.Paused ? 1.0 : 0.5;
+        Keyboard.ShowPressed(engine.ActionDown);
+        ShowCaption(engine);
+
+        gamepads.Poll(scanNow: running != wasRunning);
+        wasRunning = running;
+        ShowOtherPads(engine);
 
         string state = !engine.Running ? "off" : engine.Paused ? "paused" : "on";
         int player = engine.UserIndex is >= 0 and < 4 ? engine.UserIndex + 1 : 0;
@@ -78,25 +92,84 @@ public sealed partial class DashboardPage : Page
         }
     }
 
+    /// <summary>Names the actions of the keys held down, or says when the keys work.</summary>
+    void ShowCaption(Engine engine)
+    {
+        string caption = string.Join(" + ", GameProfile.Bindings
+            .Where(b => engine.ActionDown(b.Name))
+            .Select(b => b.Label.Length == 1 ? b.Label + " button" : b.Label));
+        string hint = caption.Length > 0 ? ""
+            : !engine.Running ? "Turn it on, then press your keys to try them"
+            : engine.Paused ? $"Press {string.Join(" or ", App.Profile.Get("PauseKey").Select(KeyNames.Label))} to resume"
+            : !engine.Live ? "Your keys work while the game is in front"
+            : "Press your keys to try them";
+        if (caption + hint == lastCaption) return;
+        lastCaption = caption + hint;
+        Caption.Text = caption;
+        CaptionHint.Text = hint;
+    }
+
+    /// <summary>Shows each controller in an XInput slot other than the keyboard controller's own.</summary>
+    void ShowOtherPads(Engine engine)
+    {
+        long now = Environment.TickCount64;
+        int shown = 0;
+        for (int i = 0; i < Gamepads.Slots; i++)
+        {
+            var item = (StackPanel)OtherPads.Children[i];
+            bool connected = i != engine.UserIndex && gamepads.Connected(i);
+            if (!connected) seenSince[i] = 0;
+            else if (seenSince[i] == 0) seenSince[i] = now;
+            // XInput lists a removed pad for about 40 ms more. Without the wait, the spare pads that put the
+            // keyboard controller in its slot, and the keyboard controller just after it turns off, would flash in.
+            bool show = connected && now - seenSince[i] >= 300;
+            if (show) shown++;
+
+            if (show && item.Visibility == Visibility.Collapsed)
+            {
+                item.Visibility = Visibility.Visible;
+                item.Opacity = 0;
+                Anim.Translate(item).Y = 30;
+                _ = Anim.Fade(item, 1, 300);
+                _ = Anim.To(Anim.Translate(item), "Y", 0, 450, Anim.Spring);
+            }
+            else if (!show)
+            {
+                item.Visibility = Visibility.Collapsed;
+            }
+            if (show) ((ControllerView)item.Children[0]).Show(gamepads.State(i));
+        }
+        OtherPadsBox.Visibility = shown > 0 ? Visibility.Visible : Visibility.Collapsed;
+        NoOtherPads.Visibility = shown == 0 ? Visibility.Visible : Visibility.Collapsed;
+    }
+
     void ShowState(string state, int player)
     {
         string pauseKeys = string.Join(" or ", App.Profile.Get("PauseKey").Select(KeyNames.Label));
-        Headline.Text = state switch
-        {
-            "on" when player > 0 => $"Your keyboard is Player {player}",
-            "on" => "Your keyboard is a controller",
-            "paused" => "Paused",
-            _ => "",
-        };
-        Headline.Visibility = Headline.Text.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+        ToggleText.Text = state switch { "on" => "On", "paused" => "Paused", _ => "Off" };
         Detail.Text = state switch
         {
             "on" when App.Profile.OnlyInGame =>
-                "This profile only works while the game is in front, so the picture stays still until you switch to the game.",
-            "on" => "Press your keys and watch the controller picture move.",
+                "Windows sees your keyboard and mouse as an Xbox controller. This profile only works while the game is in front, " +
+                "so the pictures stay still until you switch to the game.",
+            "on" => "Windows sees your keyboard and mouse as an Xbox controller. Another player can join with it in split-screen games.",
             "paused" => $"The controller stays connected but ignores your keys. Press {pauseKeys} to resume.",
-            _ => "When it is on, Windows sees your keyboard and mouse as an Xbox controller, so another player can join split-screen games.",
+            _ => "When it is on, Windows sees your keyboard and mouse as one more Xbox controller, so another player can join split-screen games.",
         };
+
+        bool badge = state != "off";
+        if (badge) PadBadgeText.Text = player > 0 ? $"Player {player}" : "On";
+        if (badge && !badgeShown)
+        {
+            Anim.SetScale(PadBadge, 0.5);
+            _ = Anim.Fade(PadBadge, 1, 200);
+            _ = Anim.Scale(PadBadge, 1, 300, Anim.Spring);
+        }
+        else if (!badge && badgeShown)
+        {
+            _ = Anim.Fade(PadBadge, 0, 200);
+        }
+        badgeShown = badge;
 
         int wanted = App.Store.Player;
         bool moved = state != "off" && wanted > 0 && player > 0 && player != wanted;

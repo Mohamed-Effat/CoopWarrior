@@ -44,6 +44,9 @@ public sealed partial class Engine
 
     const uint VIGEM_OK = 0x20000000;
 
+    static readonly Dictionary<string, int> ActionBits =
+        GameProfile.Bindings.Select((b, i) => (b.Name, i)).ToDictionary(p => p.Name, p => p.i);
+
     volatile Dictionary<string, int[]> map = GameProfile.DefaultKeys();
     volatile MouseSettings mouse = new();
     volatile bool running;
@@ -51,6 +54,8 @@ public sealed partial class Engine
     volatile string gameProcess = "";
     volatile int userIndex = -1;
     volatile bool mouseAvailable = true;
+    volatile bool live;
+    volatile uint actionsDown;
     readonly Lock reportLock = new();
     PadReport current;
 
@@ -69,6 +74,13 @@ public sealed partial class Engine
     public bool MouseAvailable => mouseAvailable;
 
     public PadReport Current { get { lock (reportLock) return current; } }
+
+    /// <summary>True while keys drive the pad: on, not paused, and the game in front when the profile asks for it.</summary>
+    public bool Live => running && live;
+
+    /// <summary>Whether a binding's keys were down when the last report was built.</summary>
+    /// <remarks>Always false while not <see cref="Live"/>.</remarks>
+    public bool ActionDown(string name) => Live && ActionBits.TryGetValue(name, out int bit) && (actionsDown & (1u << bit)) != 0;
 
     /// <summary>Takes the keys, game setting and mouse settings from a game profile. Safe while running.</summary>
     public void Apply(GameProfile p)
@@ -256,38 +268,47 @@ public sealed partial class Engine
 
     PadReport Build(double mx, double my, MouseStick stick)
     {
+        uint down = 0;
+        bool On(string name)
+        {
+            if (!Down(name)) return false;
+            down |= 1u << ActionBits[name];
+            return true;
+        }
+
         var r = new PadReport();
         ushort b = 0;
-        if (Down("DpadUp")) b |= PadButtons.DpadUp;
-        if (Down("DpadDown")) b |= PadButtons.DpadDown;
-        if (Down("DpadLeft")) b |= PadButtons.DpadLeft;
-        if (Down("DpadRight")) b |= PadButtons.DpadRight;
-        if (Down("Start")) b |= PadButtons.Start;
-        if (Down("Back")) b |= PadButtons.Back;
-        if (Down("L3")) b |= PadButtons.L3;
-        if (Down("R3")) b |= PadButtons.R3;
-        if (Down("LB")) b |= PadButtons.LB;
-        if (Down("RB")) b |= PadButtons.RB;
-        if (Down("A")) b |= PadButtons.A;
-        if (Down("B")) b |= PadButtons.B;
-        if (Down("X")) b |= PadButtons.X;
-        if (Down("Y")) b |= PadButtons.Y;
+        if (On("DpadUp")) b |= PadButtons.DpadUp;
+        if (On("DpadDown")) b |= PadButtons.DpadDown;
+        if (On("DpadLeft")) b |= PadButtons.DpadLeft;
+        if (On("DpadRight")) b |= PadButtons.DpadRight;
+        if (On("Start")) b |= PadButtons.Start;
+        if (On("Back")) b |= PadButtons.Back;
+        if (On("L3")) b |= PadButtons.L3;
+        if (On("R3")) b |= PadButtons.R3;
+        if (On("LB")) b |= PadButtons.LB;
+        if (On("RB")) b |= PadButtons.RB;
+        if (On("A")) b |= PadButtons.A;
+        if (On("B")) b |= PadButtons.B;
+        if (On("X")) b |= PadButtons.X;
+        if (On("Y")) b |= PadButtons.Y;
         r.Buttons = b;
-        r.LeftTrigger = Down("LT") ? (byte)255 : (byte)0;
-        r.RightTrigger = Down("RT") ? (byte)255 : (byte)0;
+        r.LeftTrigger = On("LT") ? (byte)255 : (byte)0;
+        r.RightTrigger = On("RT") ? (byte)255 : (byte)0;
 
-        bool mu = Down("MoveUp"), md = Down("MoveDown"), ml = Down("MoveLeft"), mr = Down("MoveRight");
+        bool mu = On("MoveUp"), md = On("MoveDown"), ml = On("MoveLeft"), mr = On("MoveRight");
         bool moveDiag = (mu != md) && (ml != mr);
         r.LeftX = Axis(mr, ml, moveDiag);
         r.LeftY = Axis(mu, md, moveDiag);
 
-        bool cu = Down("CamUp"), cd = Down("CamDown"), cl = Down("CamLeft"), cr = Down("CamRight");
+        bool cu = On("CamUp"), cd = On("CamDown"), cl = On("CamLeft"), cr = On("CamRight");
         bool camDiag = (cu != cd) && (cl != cr);
         r.RightX = Axis(cr, cl, camDiag);
         r.RightY = Axis(cu, cd, camDiag);
 
         if (stick == MouseStick.Left) (r.LeftX, r.LeftY) = Combine(r.LeftX, r.LeftY, mx, my);
         else if (stick == MouseStick.Right) (r.RightX, r.RightY) = Combine(r.RightX, r.RightY, mx, my);
+        actionsDown = down;
         return r;
     }
 
@@ -344,7 +365,7 @@ public sealed partial class Engine
             }
 
             mouseInput.Pump();
-            bool live = !paused && active;
+            live = !paused && active;
             (double mx, double my) = mouseInput.Stick(ms, live && ms.Stick != MouseStick.Off);
             PadReport cur = live ? Build(mx, my, ms.Stick) : neutral;
             if (!cur.Equals(last))

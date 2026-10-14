@@ -49,7 +49,8 @@ so it gives each one its own player.
   DYNASTY WARRIORS 3: Complete Edition Remastered is included.
 - **Only while the game is in front.** A profile can be limited to one game. When you switch to another
   window, your keys work as normal keys again.
-- **Live preview.** A drawing of the controller shows every button and stick as you press keys.
+- **Live preview.** The Dashboard draws your keyboard and its controller: the keys you press light up
+  and the controller moves with them. It also shows the other controllers Windows sees, each with its player number.
 - **Easy to install.** The installer needs no admin rights, and the app updates itself from GitHub.
 - **A built-in guide.** The first time you start the app, a short animated guide walks you through it.
 

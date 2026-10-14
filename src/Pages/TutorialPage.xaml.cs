@@ -676,22 +676,11 @@ public sealed partial class TutorialPage : Page
 
     async Task ScenePlay(CancellationToken ct)
     {
-        var caps = new Dictionary<string, Keycap>();
-        void Cap(string id, string label, double x, double y, double width = 38)
-        {
-            var k = new Keycap(label, 13, 38) { Width = width };
-            caps[id] = Add(k, x, y);
-        }
+        var keyboard = Add(new KeyboardView { Width = 400, Height = 190 }, 10, 30);
+        keyboard.ShowKeys(App.Profile,
+            ["MoveUp", "MoveDown", "MoveLeft", "MoveRight", "CamUp", "CamDown", "CamLeft", "CamRight", "A", "B", "X", "Y", "LB", "RB", "LT", "RT"]);
 
-        Cap("LB", Key("LB", "Q"), 42, 40); Cap("MoveUp", Key("MoveUp", "W"), 86, 40); Cap("RB", Key("RB", "E"), 130, 40);
-        Cap("MoveLeft", Key("MoveLeft", "A"), 56, 86); Cap("MoveDown", Key("MoveDown", "S"), 100, 86); Cap("MoveRight", Key("MoveRight", "D"), 144, 86);
-        Cap("X", Key("X", "J"), 206, 86); Cap("Y", Key("Y", "K"), 250, 86); Cap("B", Key("B", "L"), 294, 86);
-        Cap("LT", Key("LT", "Shift"), 10, 132, 84);
-        Cap("RT", Key("RT", "Ctrl"), 10, 178, 64); Cap("A", Key("A", "Space"), 82, 178, 112);
-        Cap("CamUp", Key("CamUp", "↑"), 250, 146);
-        Cap("CamLeft", Key("CamLeft", "←"), 206, 190); Cap("CamDown", Key("CamDown", "↓"), 250, 190); Cap("CamRight", Key("CamRight", "→"), 294, 190);
-
-        var pad = Add(new ControllerView { Width = 270, Height = 202 }, 356, 30);
+        var pad = Add(new ControllerView { Width = 210, Height = 158 }, 420, 46);
         var caption = Add(Text("", 14, true), 0, 252);
         caption.Width = 640;
         caption.TextAlignment = TextAlignment.Center;
@@ -725,10 +714,10 @@ public sealed partial class TutorialPage : Page
                     caption.Text = text;
                     _ = Anim.Fade(caption, 1, 150);
                 }
-                foreach (string k in keys) caps[k].IsPressed = true;
+                foreach (string k in keys) keyboard.SetPressed(k, true);
                 pad.Show(report);
                 await Task.Delay(750, ct);
-                foreach (string k in keys) caps[k].IsPressed = false;
+                foreach (string k in keys) keyboard.SetPressed(k, false);
                 pad.Show(default);
                 await Task.Delay(260, ct);
             }

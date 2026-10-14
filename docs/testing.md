@@ -24,6 +24,7 @@ pad back through XInput. Scripts are in `tools/test/` (Windows PowerShell 5.1).
 | `Test-KeyInputs.ps1` | Holds each default key (and key pairs for diagonals) and prints the pad state. Default profile, pad on. |
 | `Test-MouseLook.ps1` | Short bursts of relative mouse movement; prints the stick during and after. |
 | `Capture-Frames.ps1` | Grabs several frames of the window into one contact sheet, to check animations. |
+| `Second-Pad.ps1` | Connects one more virtual pad for `-Seconds`, standing in for a real controller (Dashboard "other controllers", player numbers). It moves on its own and sends no keyboard or mouse input. |
 
 Typical session:
 
@@ -61,6 +62,10 @@ Profiles and UI
 - [ ] Rebind dialog: key, Alt, Tab, mouse buttons inside the box, Esc cancels, Replace, Add as extra key.
 - [ ] Light and dark theme; caption buttons visible in both.
 - [ ] Dashboard driver banner: green when ViGEmBus is installed, yellow with Install driver when it is not.
+- [ ] Dashboard keyboard: with the pad on, each key lights up while held and the caption names its action;
+      nothing lights up while off, paused, or (with "Only work while the game is in front") while the app is in front.
+- [ ] Dashboard badge shows the pad's slot as reported by `[T]::Pads()`. Other controllers show with their own
+      player number and move live; the keyboard's own pad is never listed there.
 - [ ] The published build starts (not just the `bin` build) - see decisions/0005.
 
 Installer and updates (see releasing.md)

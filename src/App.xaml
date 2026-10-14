@@ -12,6 +12,7 @@
             <x:Double x:Key="SettingsCardSpacing">4</x:Double>
             <Thickness x:Key="PageContentMargin">40,0,40,40</Thickness>
             <x:Double x:Key="PageMaxWidth">1000</x:Double>
+            <x:Double x:Key="DashboardMaxWidth">1200</x:Double>
 
             <Style x:Key="GroupHeaderStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyStrongTextBlockStyle}">
                 <Setter Property="Margin" Value="1,28,0,6" />

@@ -22,10 +22,10 @@ Started as "Keyboard Pad", then briefly "Keyboard Warrior"; `v1-winforms\` is th
 - `src\Core\` - engine and data, no UI:
   `Engine` (worker loop, ViGEm calls), `MouseInput` (Raw Input, cursor hold),
   `GameProfile` (.kpad format), `ProfileStore` (data folder, active profile, CoopWarrior.ini),
-  `Updater` (Velopack checks and updates), `KeyNames`, `Driver`.
+  `Updater` (Velopack checks and updates), `Gamepads` (reads the XInput slots), `KeyNames`, `Driver`.
 - `src\Program.cs` - entry point: Velopack hooks first, then WinUI.
 - `src\Pages\` - one page per navigation item, plus `RebindDialog`.
-- `src\Controls\` - `ControllerView` (drawn pad), `Keycap`, `Anim` (awaitable storyboards).
+- `src\Controls\` - `ControllerView` (drawn pad), `KeyboardView` (drawn keyboard), `Keycap`, `Anim` (awaitable storyboards).
 - `src\DefaultProfiles\*.kpad` - profiles shipped with the app, installed into `profiles\` once.
 - `src\lib\` - ViGEmClient.dll and the ViGEmBus driver MSI, both shipped inside the app.
 - `package\` - files that sit next to `app\` in the portable folder only (Start.bat, Install-Driver.bat, README).
@@ -33,6 +33,7 @@ Started as "Keyboard Pad", then briefly "Keyboard Warrior"; `v1-winforms\` is th
 - `LICENSE` (GPL-3.0, verbatim), `LICENSE-EXCEPTION.txt` (section 7 permission for Microsoft libraries),
   `THIRD-PARTY-NOTICES.txt`. All three ship inside the app.
 - `docs\` - architecture, decisions, plans, game-profile research. See docs/README.md.
+  `docs\images\README.md` describes every image and GIF in words; read it instead of opening them.
 
 ## Things that bite
 
