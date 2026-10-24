@@ -150,6 +150,11 @@ Start.bat says the "app" folder is missing
 An antivirus warning
   -> Co-op Warrior reads which keys are held down (GetAsyncKeyState) to
      work the controller. Some antivirus programs do not like that.
+     Malwarebytes may flag ViGEmBusSetup_x64.msi as "Malware.AI". That is a
+     guess by its machine-learning scanner, not a known threat: the file is
+     the official ViGEmBus driver installer, signed by Nefarius Software
+     Solutions. Allow it or restore it from quarantine. Once the driver is
+     installed, Co-op Warrior works without that file.
 Windows warns about files from a downloaded zip
   -> Right-click the zip > Properties > Unblock, then extract it again.
 

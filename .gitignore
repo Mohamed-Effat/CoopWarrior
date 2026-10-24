@@ -5,3 +5,4 @@ dist/
 *.user
 artifacts/
 releases/
+releases-local-tests/

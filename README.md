@@ -183,6 +183,7 @@ you leave out keeps its default.
 | The keyboard got a different player number than you chose | Another controller already has that number. Disconnect it, then turn the keyboard controller off and on again. |
 | Your keys also do things in the game by themselves | Some games read the keyboard and mouse directly and give them to Player 1. Make the keyboard Player 1, or change Co-op Warrior's keys to keys the game does not use. |
 | The camera turns too fast or too slow | Change "Sensitivity" on the Mouse page. |
+| Malwarebytes flags `ViGEmBusSetup_x64.msi` as "Malware.AI" | This is a guess by its machine-learning scanner, not a known threat. The file is the official ViGEmBus driver installer, signed by Nefarius Software Solutions. Allow it or restore it from quarantine. Once the driver is installed, Co-op Warrior works without that file. |
 
 ## Build from source
 
